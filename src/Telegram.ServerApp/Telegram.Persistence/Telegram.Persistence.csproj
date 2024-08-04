@@ -10,4 +10,9 @@
     <ProjectReference Include="..\Telegram.Domain\Telegram.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DataContexts\" />
+    <Folder Include="Repositories\" />
+  </ItemGroup>
+
 </Project>

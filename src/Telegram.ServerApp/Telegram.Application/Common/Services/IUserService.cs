@@ -1,11 +1,11 @@
 ﻿using System.Linq.Expressions;
 using Telegram.Domain.Entities;
 
-namespace Telegram.Persistence.Repositories.Interfaces;
+namespace Telegram.Application.Common.Services;
 
-public interface IUserRepository
+public interface IUserService
 {
-    IQueryable<User> Get(Expression<Func<User, bool>>? predicate = default, bool asNoTracking = false, CancellationToken cancellationToken = default);
+    IEnumerable<User> Get(Expression<Func<User, bool>>? predicate = default, bool asNoTracking = false, CancellationToken cancellationToken = default);
 
     ValueTask<IList<User>> GetAllAsync(bool asNoTracking = false, CancellationToken cancellationToken = default);
 

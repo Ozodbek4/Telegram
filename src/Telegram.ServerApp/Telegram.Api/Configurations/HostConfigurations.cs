@@ -6,7 +6,10 @@ public static partial class HostConfigurations
     {
         builder
             .AddDevTools()
-            .AddExposers();
+            .AddExposers()
+            .AddMapper()
+            .AddInfrastructure()
+            .AddPersistence();
 
         return new ValueTask<WebApplicationBuilder>(builder);
     }

@@ -11,7 +11,7 @@ public class UserRepository : EntityRepositoryBase<User, TelegramDbContext>, IUs
     {
     }
 
-    public new IEnumerable<User> Get(Expression<Func<User, bool>>? predicate = null, bool asNoTracking = false, CancellationToken cancellationToken = default) =>
+    public new IQueryable<User> Get(Expression<Func<User, bool>>? predicate = null, bool asNoTracking = false, CancellationToken cancellationToken = default) =>
         base.Get(predicate, asNoTracking, cancellationToken);
 
     public new ValueTask<IList<User>> GetAllAsync(bool asNoTracking = false, CancellationToken cancellationToken = default) =>

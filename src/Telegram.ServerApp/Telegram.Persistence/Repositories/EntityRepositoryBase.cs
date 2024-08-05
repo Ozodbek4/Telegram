@@ -61,20 +61,28 @@ public abstract class EntityRepositoryBase<TEntity, TContext>(TContext dbContext
         return entity;
     }
 
-    protected async ValueTask<TEntity> UpdateAsync(TEntity entity, bool saveChanges = true, CancellationToken cancellationToken = default)
+    protected async ValueTask<TEntity?> UpdateAsync(TEntity entity, bool saveChanges = true, CancellationToken cancellationToken = default)
     {
-        if (await GetById(entity.Id, true, cancellationToken) is not null)
+        var result = await GetByIdAsync(entity.Id, true, cancellationToken);
+
+        if (result is not null)
             DbContext.Update(entity);
 
-        return entity;
+        if (saveChanges)
+            await DbContext.SaveChangesAsync();
+
+        return result is null ? null : entity;
     }
 
     protected async ValueTask<TEntity?> DeleteByIdAsync(Guid id, bool saveChanges = true, CancellationToken cancellationToken = default)
     {
-        var result = await GetById(id, true, cancellationToken);
+        var result = await GetByIdAsync(id, true, cancellationToken);
 
         if (result is not null)
             DbContext.Remove(result);
+
+        if (saveChanges)
+            await DbContext.SaveChangesAsync();
 
         return result;
     }

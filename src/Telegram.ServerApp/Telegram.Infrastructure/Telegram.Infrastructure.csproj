@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DeepCloner" Version="0.10.4" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Telegram.Application\Telegram.Application.csproj" />
     <ProjectReference Include="..\Telegram.Persistence\Telegram.Persistence.csproj" />
   </ItemGroup>

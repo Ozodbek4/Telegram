@@ -1,10 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using Telegram.Domain.Common.Caching;
 using Telegram.Domain.Common.Entities;
+using Telegram.Persistence.Caching.Brokers;
 
 namespace Telegram.Persistence.Repositories;
 
-public abstract class EntityRepositoryBase<TEntity, TContext>(TContext dbContext) where TEntity : class, IEntity where TContext : DbContext
+public abstract class EntityRepositoryBase<TEntity, TContext>(TContext dbContext, ICacheBroker cacheBroker,
+    CacheEntryOptions? cacheEntryOptions = default) 
+        where TEntity : class, IEntity where TContext : DbContext
 {
     protected TContext DbContext => dbContext;
 
@@ -33,12 +37,24 @@ public abstract class EntityRepositoryBase<TEntity, TContext>(TContext dbContext
 
     protected async ValueTask<TEntity?> GetByIdAsync(Guid id, bool asNoTracking = false, CancellationToken cancellationToken = default)
     {
-        var initialQuery = dbContext.Set<TEntity>().Where(entity => true);
+        var foundEntity =  default(TEntity);
 
-        if (asNoTracking)
-            initialQuery = initialQuery.AsNoTracking();
+        if (cacheEntryOptions is null || !await cacheBroker.TryGetAsync(id.ToString(), out TEntity? cacheEntity))
+        {
+            var initialQuery = DbContext.Set<TEntity>().AsQueryable();
+            if (asNoTracking)
+                initialQuery = initialQuery.AsNoTracking();
 
-        return await initialQuery.SingleOrDefaultAsync(entity => entity.Id == id);
+            foundEntity = await initialQuery.FirstOrDefaultAsync(entity => entity.Id == id, cancellationToken);
+            if (foundEntity is not null && cacheEntryOptions is not null)
+                await cacheBroker.SetAsync(foundEntity.Id.ToString(), foundEntity, cacheEntryOptions);
+        }
+        else
+        {
+            foundEntity = cacheEntity;
+        }
+
+        return foundEntity;
     }
 
     protected async ValueTask<IList<TEntity>> GetByIdsAsync(IList<Guid> ids, bool asNoTracking = false, CancellationToken cancellationToken = default)
@@ -58,6 +74,9 @@ public abstract class EntityRepositoryBase<TEntity, TContext>(TContext dbContext
         if (saveChanges)
             await DbContext.SaveChangesAsync();
 
+        if (cacheEntryOptions is not null)
+            await cacheBroker.SetAsync(entity.Id.ToString(), entity, cacheEntryOptions);
+
         return entity;
     }
 
@@ -71,6 +90,9 @@ public abstract class EntityRepositoryBase<TEntity, TContext>(TContext dbContext
         if (saveChanges)
             await DbContext.SaveChangesAsync();
 
+        if (result is not null && cacheEntryOptions is not null)
+            await cacheBroker.SetAsync(result.Id.ToString(), entity, cacheEntryOptions);
+
         return result is null ? null : entity;
     }
 
@@ -83,6 +105,9 @@ public abstract class EntityRepositoryBase<TEntity, TContext>(TContext dbContext
 
         if (saveChanges)
             await DbContext.SaveChangesAsync();
+
+        if (result is not null && cacheEntryOptions is not null)
+            await cacheBroker.DeleteAsync<TEntity>(id.ToString());
 
         return result;
     }

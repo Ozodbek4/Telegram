@@ -1,21 +1,20 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
+﻿using Force.DeepCloner;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using System.Text;
 using Telegram.Domain.Common.Caching;
 using Telegram.Infrastructure.Common.Settings;
 using Telegram.Persistence.Caching.Brokers;
-using Newtonsoft.Json;
-
-using System.Text;
-using Force.DeepCloner;
 
 namespace Telegram.Infrastructure.Common.Caching.Brokers;
 
 public class RedisDistributedCacheBroker(IOptions<CacheSettings> settings, IDistributedCache distributedCache) : ICacheBroker
 {
-    public readonly DistributedCacheEntryOptions _entryOptions = new DistributedCacheEntryOptions()
+    public readonly DistributedCacheEntryOptions _entryOptions = new DistributedCacheEntryOptions
     {
         AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(settings.Value.AbsoluteExpirationTimeInSeconds),
-        SlidingExpiration = TimeSpan.FromSeconds(settings.Value.SlidingExpirationTimeInSeconds)
+        SlidingExpiration = TimeSpan.FromSeconds(settings.Value.SlidingExpirationTimeInSeconds),
     };
 
     public async ValueTask<T?> GetAsync<T>(string key)
@@ -32,7 +31,7 @@ public class RedisDistributedCacheBroker(IOptions<CacheSettings> settings, IDist
         if (foundEntity is not null)
         {
             value = JsonConvert.DeserializeObject<T>(foundEntity);
-            
+
             return ValueTask.FromResult(true);
         }
 
@@ -50,14 +49,14 @@ public class RedisDistributedCacheBroker(IOptions<CacheSettings> settings, IDist
         var value = await valueFactory();
         await SetAsync(key, value, entryOptions);
 
-        return value;   
+        return value;
     }
 
     public async ValueTask SetAsync<T>(string key, T value, CacheEntryOptions? entryOptions = null)
     {
-        await distributedCache.SetStringAsync(key, JsonConvert.SerializeObject(value) , GetCacheEntryOptions(entryOptions));
+        await distributedCache.SetStringAsync(key, JsonConvert.SerializeObject(value), GetCacheEntryOptions(entryOptions));
     }
-    
+
     public async ValueTask DeleteAsync<T>(string key)
     {
         await distributedCache.RemoveAsync(key);

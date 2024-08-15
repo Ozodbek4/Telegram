@@ -9,7 +9,8 @@ public static partial class HostConfigurations
             .AddExposers()
             .AddMapper()
             .AddInfrastructure()
-            .AddPersistence();
+            .AddPersistence()
+            .AddCaching();
 
         return new ValueTask<WebApplicationBuilder>(builder);
     }

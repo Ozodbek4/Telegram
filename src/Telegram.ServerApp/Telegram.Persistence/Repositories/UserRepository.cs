@@ -1,5 +1,7 @@
 ﻿using System.Linq.Expressions;
+using Telegram.Domain.Common.Caching;
 using Telegram.Domain.Entities;
+using Telegram.Persistence.Caching.Brokers;
 using Telegram.Persistence.DataContexts;
 using Telegram.Persistence.Repositories.Interfaces;
 
@@ -7,7 +9,7 @@ namespace Telegram.Persistence.Repositories;
 
 public class UserRepository : EntityRepositoryBase<User, TelegramDbContext>, IUserRepository
 {
-    public UserRepository(TelegramDbContext context) : base(context)
+    public UserRepository(TelegramDbContext context, ICacheBroker cacheBroker) : base(context, cacheBroker, new CacheEntryOptions())
     {
     }
 

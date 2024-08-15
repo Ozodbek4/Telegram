@@ -2,7 +2,10 @@
 using System.Reflection;
 using Telegram.Api.Mappers;
 using Telegram.Application.Common.Services;
+using Telegram.Infrastructure.Common.Caching.Brokers;
 using Telegram.Infrastructure.Common.Services;
+using Telegram.Infrastructure.Common.Settings;
+using Telegram.Persistence.Caching.Brokers;
 using Telegram.Persistence.DataContexts;
 using Telegram.Persistence.Interceptors;
 using Telegram.Persistence.Repositories;
@@ -71,7 +74,7 @@ public static partial class HostConfigurations
         builder.Services
             .AddScoped<IUserRepository, UserRepository>();
 
-        builder.Services
+        builder.Services 
             .AddScoped<AuditableInterceptor>()
             .AddScoped<SoftDeletedInterceptor>();
 
@@ -92,6 +95,22 @@ public static partial class HostConfigurations
     {
         builder.Services
             .AddAutoMapper(Assemblies);
+
+        return builder;
+    }
+
+    private static WebApplicationBuilder AddCaching(this WebApplicationBuilder builder)
+    {
+        builder.Services.Configure<CacheSettings>(builder.Configuration.GetSection(nameof(CacheSettings)));
+
+        builder.Services.AddSingleton<ICacheBroker, RedisDistributedCacheBroker>();
+
+        builder.Services
+            .AddStackExchangeRedisCache(option =>
+            {
+                option.Configuration = builder.Configuration.GetConnectionString("RedisConnectionString");
+                option.InstanceName = "TelegramApp";
+            });
 
         return builder;
     }

@@ -1,8 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
-using Telegram.Api.Mappers;
+using System.Text;
+using Telegram.Application.Common.Helper;
 using Telegram.Application.Common.Services;
+using Telegram.Application.Common.Settings;
 using Telegram.Infrastructure.Common.Caching.Brokers;
+using Telegram.Infrastructure.Common.Helper;
 using Telegram.Infrastructure.Common.Services;
 using Telegram.Infrastructure.Common.Settings;
 using Telegram.Persistence.Caching.Brokers;
@@ -38,7 +43,7 @@ public static partial class HostConfigurations
         builder.Services
             .AddRouting(options => options.LowercaseUrls = true)
             .AddControllers();
-            
+
 
         return builder;
     }
@@ -56,11 +61,11 @@ public static partial class HostConfigurations
     {
         app
             .MapControllers();
-        
+
         return app;
     }
     #endregion
-    
+
     private static WebApplicationBuilder AddInfrastructure(this WebApplicationBuilder builder)
     {
         builder.Services
@@ -74,7 +79,7 @@ public static partial class HostConfigurations
         builder.Services
             .AddScoped<IUserRepository, UserRepository>();
 
-        builder.Services 
+        builder.Services
             .AddScoped<AuditableInterceptor>()
             .AddScoped<SoftDeletedInterceptor>();
 
@@ -110,6 +115,49 @@ public static partial class HostConfigurations
             {
                 option.Configuration = builder.Configuration.GetConnectionString("RedisConnectionString");
                 option.InstanceName = "TelegramApp";
+            });
+
+        return builder;
+    }
+
+    private static WebApplicationBuilder AddIdentityInfrastructure(this WebApplicationBuilder builder)
+    {
+        builder.Services
+            .AddScoped<IAccountService, AccountService>()
+            .AddScoped<ITokenGeneratorService, TokenGeneratorService>()
+            .AddScoped<IPasswordHasher, PasswordHasher>();
+
+        builder.Services
+            .Configure<JwtSettings>(builder.Configuration.GetSection(nameof(JwtSettings)));
+
+        var jwtSettings = builder.Configuration.GetSection(nameof(JwtSettings)).Get<JwtSettings>() ??
+            throw new InvalidOperationException("JwtSettings is not configured.");
+
+        builder.Services
+            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(o =>
+            {
+                o.RequireHttpsMetadata = false;
+
+                o.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = jwtSettings.ValidateIssuer,
+                    ValidIssuer = jwtSettings.ValidIssuer,
+                    ValidAudience = jwtSettings.ValidAudience,
+                    ValidateAudience = jwtSettings.ValidateAudience,
+                    ValidateLifetime = jwtSettings.ValidateLifeTime,
+                    ValidateIssuerSigningKey = jwtSettings.ValidateIssuerSigningKey,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
+                };
+                o.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        context.Token = context.Request.Cookies["token"];
+                        return Task.CompletedTask;
+                    }
+                };
+
             });
 
         return builder;

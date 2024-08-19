@@ -1,9 +1,7 @@
-﻿namespace Telegram.Api.Models.Dtos;
+﻿namespace Telegram.Application.Common.Models.Dtos;
 
-public class UserDto
+public class SignUpDetails
 {
-    public Guid Id { get; set; }
-
     public string FirstName { get; set; } = default!;
 
     public string LastName { get; set; } = default!;

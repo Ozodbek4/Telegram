@@ -10,7 +10,8 @@ public static partial class HostConfigurations
             .AddMapper()
             .AddInfrastructure()
             .AddPersistence()
-            .AddCaching();
+            .AddCaching()
+            .AddIdentityInfrastructure();
 
         return new ValueTask<WebApplicationBuilder>(builder);
     }

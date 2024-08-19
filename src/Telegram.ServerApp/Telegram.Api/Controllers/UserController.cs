@@ -12,7 +12,7 @@ public class UserController(IUserService userService, IMapper mapper) : Controll
     [HttpGet]
     public async ValueTask<IActionResult> GetAll()
     {
-        return Ok(await userService.GetAllAsync());
+        return Ok(userService.Get());
     }
 
     [HttpGet("{id:guid}")]

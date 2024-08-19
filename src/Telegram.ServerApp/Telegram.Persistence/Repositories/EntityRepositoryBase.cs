@@ -7,7 +7,7 @@ using Telegram.Persistence.Caching.Brokers;
 namespace Telegram.Persistence.Repositories;
 
 public abstract class EntityRepositoryBase<TEntity, TContext>(TContext dbContext, ICacheBroker cacheBroker,
-    CacheEntryOptions? cacheEntryOptions = default) 
+    CacheEntryOptions? cacheEntryOptions = default)
         where TEntity : class, IEntity where TContext : DbContext
 {
     protected TContext DbContext => dbContext;
@@ -25,19 +25,9 @@ public abstract class EntityRepositoryBase<TEntity, TContext>(TContext dbContext
         return initialQuery;
     }
 
-    protected async ValueTask<IList<TEntity>> GetAllAsync(bool asNoTracking = false, CancellationToken cancellationToken = default)
-    {
-        var initialQuery = DbContext.Set<TEntity>().Where(entity => true);
-
-        if (asNoTracking)
-            initialQuery = initialQuery.AsNoTracking();
-
-        return await initialQuery.ToListAsync();
-    }
-
     protected async ValueTask<TEntity?> GetByIdAsync(Guid id, bool asNoTracking = false, CancellationToken cancellationToken = default)
     {
-        var foundEntity =  default(TEntity);
+        var foundEntity = default(TEntity);
 
         if (cacheEntryOptions is null || !await cacheBroker.TryGetAsync(id.ToString(), out TEntity? cacheEntity))
         {
@@ -57,16 +47,6 @@ public abstract class EntityRepositoryBase<TEntity, TContext>(TContext dbContext
         return foundEntity;
     }
 
-    protected async ValueTask<IList<TEntity>> GetByIdsAsync(IList<Guid> ids, bool asNoTracking = false, CancellationToken cancellationToken = default)
-    {
-        var initialQuery = DbContext.Set<TEntity>().Where(entity => true);
-
-        if (asNoTracking)
-            initialQuery = initialQuery.AsNoTracking();
-
-        return await initialQuery.Where(entity => ids.Contains(entity.Id)).ToListAsync();
-    }
-
     protected async ValueTask<TEntity> CreateAsync(TEntity entity, bool saveChanges = true, CancellationToken cancellationToken = default)
     {
         await DbContext.Set<TEntity>().AddAsync(entity);
@@ -80,35 +60,32 @@ public abstract class EntityRepositoryBase<TEntity, TContext>(TContext dbContext
         return entity;
     }
 
-    protected async ValueTask<TEntity?> UpdateAsync(TEntity entity, bool saveChanges = true, CancellationToken cancellationToken = default)
+    protected async ValueTask<TEntity> UpdateAsync(TEntity entity, bool saveChanges = true, CancellationToken cancellationToken = default)
     {
-        var result = await GetByIdAsync(entity.Id, true, cancellationToken);
-
-        if (result is not null)
-            DbContext.Update(entity);
+        DbContext.Update(entity);
 
         if (saveChanges)
             await DbContext.SaveChangesAsync();
 
-        if (result is not null && cacheEntryOptions is not null)
-            await cacheBroker.SetAsync(result.Id.ToString(), entity, cacheEntryOptions);
+        if (cacheEntryOptions is not null)
+            await cacheBroker.SetAsync(entity.Id.ToString(), entity, cacheEntryOptions);
 
-        return result is null ? null : entity;
+        return entity!;
     }
 
-    protected async ValueTask<TEntity?> DeleteByIdAsync(Guid id, bool saveChanges = true, CancellationToken cancellationToken = default)
+    protected async ValueTask<TEntity> DeleteByIdAsync(Guid id, bool saveChanges = true, CancellationToken cancellationToken = default)
     {
-        var result = await GetByIdAsync(id, true, cancellationToken);
+        var result = await DbContext.Set<TEntity>().FirstOrDefaultAsync(entity => entity.Id == id) ??
+            throw new ArgumentNullException("Entity is not exists");
 
-        if (result is not null)
-            DbContext.Remove(result);
+        DbContext.Remove(result);
 
         if (saveChanges)
             await DbContext.SaveChangesAsync();
 
-        if (result is not null && cacheEntryOptions is not null)
+        if (cacheEntryOptions is not null)
             await cacheBroker.DeleteAsync<TEntity>(id.ToString());
 
-        return result;
+        return result!;
     }
 }

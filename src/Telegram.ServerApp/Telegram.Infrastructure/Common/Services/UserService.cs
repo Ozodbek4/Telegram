@@ -47,8 +47,8 @@ public class UserService(IUserRepository userRepository, IPasswordHasher passwor
         return await userRepository.UpdateAsync(entity, saveChanges, cancellationToken);
     }
 
-    public ValueTask<User> DeleteByIdAsync(Guid entity, bool saveChanges = true, CancellationToken cancellationToken = default) =>
-        userRepository.DeleteByIdAsync(entity, saveChanges, cancellationToken);
+    public ValueTask<User> DeleteByIdAsync(Guid id, bool saveChanges = true, CancellationToken cancellationToken = default) =>
+        userRepository.DeleteByIdAsync(id, saveChanges, cancellationToken);
 
     private bool IsUniqueEmail(string emailAddress, CancellationToken cancellationToken = default) =>
         !userRepository.Get(asNoTracking: true, cancellationToken: cancellationToken).Any(user => user.EmailAddress == emailAddress);

@@ -6,10 +6,12 @@ using System.Text;
 using Telegram.Application.Common.Helper;
 using Telegram.Application.Common.Services;
 using Telegram.Application.Common.Settings;
+using Telegram.Application.Services;
 using Telegram.Infrastructure.Common.Caching.Brokers;
 using Telegram.Infrastructure.Common.Helper;
 using Telegram.Infrastructure.Common.Services;
 using Telegram.Infrastructure.Common.Settings;
+using Telegram.Infrastructure.Services;
 using Telegram.Persistence.Caching.Brokers;
 using Telegram.Persistence.DataContexts;
 using Telegram.Persistence.Interceptors;
@@ -60,7 +62,16 @@ public static partial class HostConfigurations
     private static WebApplication UseExposers(this WebApplication app)
     {
         app
-            .MapControllers();
+            .UseAuthentication()
+            .UseAuthorization()
+            .UseRouting()
+            .UseHsts()
+            .UseHttpsRedirection();
+
+        app
+            .MapControllerRoute(
+                name: "default",
+                pattern: "{controller=Account}/{action=Login}");
 
         return app;
     }
@@ -69,7 +80,10 @@ public static partial class HostConfigurations
     private static WebApplicationBuilder AddInfrastructure(this WebApplicationBuilder builder)
     {
         builder.Services
-            .AddScoped<IUserService, UserService>();
+            .AddScoped<IUserService, UserService>()
+            .AddScoped<IMessageService, MessageService>()
+            .AddScoped<IChatService, ChatService>()
+            .AddScoped<IChatOrchestrationService, ChatOrchestrationService>();
 
         return builder;
     }
@@ -77,7 +91,9 @@ public static partial class HostConfigurations
     private static WebApplicationBuilder AddPersistence(this WebApplicationBuilder builder)
     {
         builder.Services
-            .AddScoped<IUserRepository, UserRepository>();
+            .AddScoped<IUserRepository, UserRepository>()
+            .AddScoped<IMessageRepository, MessageRepository>()
+            .AddScoped<IChatRepository, ChatRepository>();
 
         builder.Services
             .AddScoped<AuditableInterceptor>()

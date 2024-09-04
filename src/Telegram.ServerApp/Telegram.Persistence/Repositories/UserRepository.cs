@@ -1,5 +1,4 @@
 ﻿using System.Linq.Expressions;
-using Telegram.Domain.Common.Caching;
 using Telegram.Domain.Entities;
 using Telegram.Persistence.Caching.Brokers;
 using Telegram.Persistence.DataContexts;
@@ -7,12 +6,9 @@ using Telegram.Persistence.Repositories.Interfaces;
 
 namespace Telegram.Persistence.Repositories;
 
-public class UserRepository : EntityRepositoryBase<User, TelegramDbContext>, IUserRepository
+public class UserRepository(TelegramDbContext context, ICacheBroker cacheBroker)
+    : EntityRepositoryBase<User, TelegramDbContext>(context, cacheBroker, new()), IUserRepository
 {
-    public UserRepository(TelegramDbContext context, ICacheBroker cacheBroker) : base(context, cacheBroker, new CacheEntryOptions())
-    {
-    }
-
     public new IQueryable<User> Get(Expression<Func<User, bool>>? predicate = null, bool asNoTracking = false, CancellationToken cancellationToken = default) =>
         base.Get(predicate, asNoTracking, cancellationToken);
 

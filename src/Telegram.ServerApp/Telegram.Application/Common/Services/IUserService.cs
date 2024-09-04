@@ -15,5 +15,5 @@ public interface IUserService
 
     ValueTask<User> UpdateAsync(User entity, bool saveChanges = true, CancellationToken cancellationToken = default);
 
-    ValueTask<User> DeleteByIdAsync(Guid entity, bool saveChanges = true, CancellationToken cancellationToken = default);
+    ValueTask<User> DeleteByIdAsync(Guid id, bool saveChanges = true, CancellationToken cancellationToken = default);
 }

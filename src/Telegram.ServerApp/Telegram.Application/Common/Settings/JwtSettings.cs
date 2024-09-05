@@ -12,7 +12,7 @@ public class JwtSettings
 
     public bool ValidateLifeTime { get; set; }
 
-    public int ExpressionTimeInMinutes { get; set; }
+    public int ExpirationTimeInMinutes { get; set; }
 
     public bool ValidateIssuerSigningKey { get; set; }
 

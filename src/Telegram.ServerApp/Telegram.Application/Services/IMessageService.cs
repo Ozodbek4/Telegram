@@ -16,4 +16,6 @@ public interface IMessageService
     ValueTask<Message> UpdateAsync(Message entity, bool saveChanges = true, CancellationToken cancellationToken = default);
 
     ValueTask<Message> DeleteByIdAsync(Guid id, bool saveChanges = true, CancellationToken cancellationToken = default);
+
+    ValueTask<bool> DeleteByChatIdAsync(Guid chatId, bool saveChanges = true, CancellationToken cancellationToken = default);
 }

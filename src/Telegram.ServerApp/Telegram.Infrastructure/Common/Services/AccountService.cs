@@ -1,13 +1,17 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Options;
 using Telegram.Application.Common.Helper;
 using Telegram.Application.Common.Models.Dtos;
 using Telegram.Application.Common.Services;
+using Telegram.Application.Common.Settings;
 using Telegram.Domain.Entities;
 
 namespace Telegram.Infrastructure.Common.Services;
 
-public class AccountService(IUserService userService, ITokenGeneratorService tokenGeneratorService, IPasswordHasher passwordHasher, IMapper mapper) : IAccountService
+public class AccountService(IUserService userService, ITokenGeneratorService tokenGeneratorService, IPasswordHasher passwordHasher, IMapper mapper, IOptions<JwtSettings> jwtSettings) : IAccountService
 {
+    public JwtSettings JwtSettings { get; set; } = jwtSettings.Value;
+
     public async ValueTask<bool> SignUpAsync(SignUpDetails user, bool saveChanges = true, CancellationToken cancellationToken = default)
     {
         var u = mapper.Map<User>(user);

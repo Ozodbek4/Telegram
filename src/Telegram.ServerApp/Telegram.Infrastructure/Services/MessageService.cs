@@ -27,4 +27,7 @@ public class MessageService(IMessageRepository messageRepository) : IMessageServ
 
     public ValueTask<Message> DeleteByIdAsync(Guid id, bool saveChanges = true, CancellationToken cancellationToken = default) =>
         messageRepository.DeleteByIdAsync(id, saveChanges, cancellationToken);
+
+    public ValueTask<bool> DeleteByChatIdAsync(Guid chatId, bool saveChanges = true, CancellationToken cancellationToken = default) =>
+        messageRepository.DeleteByChatIdAsync(chatId, saveChanges, cancellationToken);
 }

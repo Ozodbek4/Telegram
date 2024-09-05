@@ -1,5 +1,4 @@
 ﻿using System.Linq.Expressions;
-using Telegram.Domain.Common.Caching;
 using Telegram.Domain.Entities;
 using Telegram.Persistence.Caching.Brokers;
 using Telegram.Persistence.DataContexts;
@@ -7,7 +6,7 @@ using Telegram.Persistence.Repositories.Interfaces;
 
 namespace Telegram.Persistence.Repositories;
 
-public class ChatRepository(TelegramDbContext context, ICacheBroker cacheBroker) 
+public class ChatRepository(TelegramDbContext context, ICacheBroker cacheBroker)
     : EntityRepositoryBase<Chat, TelegramDbContext>(context, cacheBroker, new()), IChatRepository
 {
     public new IQueryable<Chat> Get(Expression<Func<Chat, bool>>? predicate = null, bool asNoTracking = false, CancellationToken cancellationToken = default) =>

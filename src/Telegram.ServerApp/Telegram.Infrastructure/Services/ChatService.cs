@@ -6,7 +6,7 @@ using Telegram.Persistence.Repositories.Interfaces;
 
 namespace Telegram.Infrastructure.Services;
 
-public class ChatService(IChatRepository chatRepository) : IChatService
+public class ChatService(IChatRepository chatRepository, IMessageService messageService) : IChatService
 {
     public IEnumerable<Chat> Get(Expression<Func<Chat, bool>>? predicate = null, bool asNoTracking = false, CancellationToken cancellationToken = default) =>
         chatRepository.Get(predicate, asNoTracking, cancellationToken);
@@ -33,6 +33,11 @@ public class ChatService(IChatRepository chatRepository) : IChatService
     public ValueTask<Chat> UpdateAsync(Chat entity, bool saveChanges = true, CancellationToken cancellationToken = default) =>
         chatRepository.UpdateAsync(entity, saveChanges, cancellationToken);
 
-    public ValueTask<Chat> DeleteByIdAsync(Guid id, bool saveChanges = true, CancellationToken cancellationToken = default) => 
-        chatRepository.DeleteByIdAsync(id, saveChanges, cancellationToken);
+    public async ValueTask<Chat> DeleteByIdAsync(Guid id, bool saveChanges = true, CancellationToken cancellationToken = default)
+    {
+        var result = await chatRepository.DeleteByIdAsync(id, saveChanges, cancellationToken);
+        await messageService.DeleteByChatIdAsync(id, saveChanges, cancellationToken);
+
+        return result;
+    }
 }

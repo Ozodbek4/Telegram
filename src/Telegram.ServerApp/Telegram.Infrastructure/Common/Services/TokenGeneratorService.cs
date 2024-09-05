@@ -31,7 +31,7 @@ public class TokenGeneratorService(IOptions<JwtSettings> jwtSettings) : ITokenGe
             audience: _jwtSettings.ValidAudience,
             claims: claims,
             notBefore: DateTime.UtcNow,
-            expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpressionTimeInMinutes),
+            expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationTimeInMinutes),
             signingCredentials: credential
             );
     }

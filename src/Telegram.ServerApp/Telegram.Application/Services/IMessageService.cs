@@ -5,9 +5,9 @@ namespace Telegram.Application.Services;
 
 public interface IMessageService
 {
-    IEnumerable<Message> Get(Expression<Func<Message, bool>>? predicate = default, bool asNoTracking = false, CancellationToken cancellationToken = default);
+    IEnumerable<Message> Get(Guid firstUserId, Expression<Func<Message, bool>>? predicate = default, bool asNoTracking = false, CancellationToken cancellationToken = default);
 
-    ValueTask<Message?> GetByIdAsync(Guid id, bool asNoTracking = false, CancellationToken cancellationToken = default);
+    ValueTask<Message?> GetByIdAsync(Guid id, Guid firstUserId, bool asNoTracking = false, CancellationToken cancellationToken = default);
 
     ValueTask<IList<Message>> GetByUsersIdAsync(Guid firstUserId, Guid secondUserId, bool asNoTracking = false, CancellationToken cancellationToken = default);
 

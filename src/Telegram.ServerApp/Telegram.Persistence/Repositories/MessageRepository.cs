@@ -32,6 +32,24 @@ public class MessageRepository
     public new ValueTask<Message> UpdateAsync(Message entity, bool saveChanges = true, CancellationToken cancellationToken = default) =>
         base.UpdateAsync(entity, saveChanges, cancellationToken);
 
+    public  async ValueTask<IList<Message>> UpdateRangeAsync(IList<Message> entities, bool saveChanges = true, CancellationToken cancellationToken = default)
+    {
+        _context.UpdateRange(entities);
+
+        if (saveChanges)
+            await _context.SaveChangesAsync(cancellationToken);
+
+        entities.ToList().ForEach(async message =>
+        {
+            Message mes;
+
+            if (await _cacheBroker.TryGetAsync(message.Id.ToString(), out mes!))
+                await _cacheBroker.SetAsync(message.Id.ToString(), message);
+        });
+        
+        return entities;
+    }
+
     public new ValueTask<Message> DeleteByIdAsync(Guid entity, bool saveChanges = true, CancellationToken cancellationToken = default) =>
         base.DeleteByIdAsync(entity, saveChanges, cancellationToken);
 

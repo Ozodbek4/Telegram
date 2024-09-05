@@ -36,18 +36,18 @@ public class MessageController(IMessageService messageService, IChatService chat
     }
 
     [HttpPost]
-    public async ValueTask<IActionResult> Create(Guid senderId, Guid receiverId, string body)
+    public async ValueTask<IActionResult> Create(Guid receiverId, string body)
     {
         var result = await chatOrchestrationService
-            .SaveMessageToChatAsync(new Message { SenderId = senderId, ReceiverId = receiverId, Body = body }, true, HttpContext.RequestAborted);
+            .SaveMessageToChatAsync(new Message { SenderId = GetRequestUserId(), ReceiverId = receiverId, Body = body }, true, HttpContext.RequestAborted);
 
         return Ok(mapper.Map<MessageDto>(result));
     }
 
-    [HttpPut]
+    [HttpPut("{id:guid}")]
     public async ValueTask<IActionResult> Update([FromRoute] Guid id, [FromBody] string body)
     {
-        var message = await messageService.GetByIdAsync(id, true, HttpContext.RequestAborted)
+        var message = await messageService.GetByIdAsync(id, GetRequestUserId(), true, HttpContext.RequestAborted)
             ?? throw new ArgumentNullException();
         message.Body = body;
 

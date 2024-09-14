@@ -59,14 +59,11 @@ public class MessageRepository
 
         messages.ForEach(async message =>
         {
+            Message? isExists;
             message.IsDeleted = true;
-            try
-            {
+
+            if (await _cacheBroker.TryGetAsync(message.Id.ToString(), out isExists))
                 await _cacheBroker.DeleteAsync<Message>(chatId.ToString());
-            }
-            catch
-            {
-            }
         });
 
         _context.UpdateRange(messages);

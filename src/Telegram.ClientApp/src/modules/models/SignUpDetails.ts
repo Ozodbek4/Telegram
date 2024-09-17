@@ -1,6 +1,4 @@
-export class User{
-    public id!: string;
-
+export class SignUpDetails{
     public firstName!: string;
 
     public lastName!: string;
@@ -8,4 +6,6 @@ export class User{
     public userName!: string;
 
     public emailAddress!: string;
+
+    public password!: string;
 }

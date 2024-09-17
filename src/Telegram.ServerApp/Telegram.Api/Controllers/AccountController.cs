@@ -4,8 +4,17 @@ using Telegram.Application.Common.Services;
 
 namespace Telegram.Api.Controllers;
 
-public class AccountController(IAccountService accountService) : Controller
+public class AccountController(IAccountService accountService, IUserService userService) : Controller
 {
+    [HttpGet("me")]
+    public async ValueTask<IActionResult> GetCurrentUser()
+    {
+        if (!User.Identity.IsAuthenticated)
+            return NotFound();
+
+        return Ok(await userService.GetByIdAsync(GetRequestUserId()));
+    }
+
     [HttpPost("singUp")]
     public async ValueTask<IActionResult> SignUp([FromBody] SignUpDetails user)
     {
@@ -14,6 +23,7 @@ public class AccountController(IAccountService accountService) : Controller
         return result ? Ok() : BadRequest();
     }
 
+    //[HttpGet("me")]
     public IActionResult Login()
     {
         if (User.Identity.IsAuthenticated)
@@ -32,4 +42,6 @@ public class AccountController(IAccountService accountService) : Controller
 
         return result is not null ? Ok(result) : BadRequest();
     }
+
+    private Guid GetRequestUserId() => Guid.Parse(HttpContext.User.Claims.FirstOrDefault(claim => claim.Type == "UserId")!.Value);
 }

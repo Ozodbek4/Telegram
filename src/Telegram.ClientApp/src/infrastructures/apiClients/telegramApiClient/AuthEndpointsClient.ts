@@ -17,12 +17,12 @@ export class AuthEndpointsClient {
     }
 
     public async signUpAsync(signUpDetails: SignUpDetails) {
-        const endpointUrl = "signUp";
+        const endpointUrl = "signup";
         return await this.client.postAsync(endpointUrl, signUpDetails);
     }
 
     public async singInAsync(signInDetails: SignInDetails) {
-        const endpointUrl = "signIn";
+        const endpointUrl = "signin";
         return (await this.client.postAsync<IdentityToken>(endpointUrl, signInDetails));
     }
 }

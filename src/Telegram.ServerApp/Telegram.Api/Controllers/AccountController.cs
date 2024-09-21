@@ -15,7 +15,7 @@ public class AccountController(IAccountService accountService, IUserService user
         return Ok(await userService.GetByIdAsync(GetRequestUserId()));
     }
 
-    [HttpPost("signup")]
+    [HttpPost("sign-up")]
     public async ValueTask<IActionResult> SignUp([FromBody] SignUpDetails user)
     {
         var result = await accountService.SignUpAsync(user, true, HttpContext.RequestAborted);
@@ -30,7 +30,7 @@ public class AccountController(IAccountService accountService, IUserService user
             return Ok();
         return NotFound();
     }
-    [HttpPost("signin")]
+    [HttpPost("sign-in")]
     public async ValueTask<IActionResult> SignIn([FromBody] SignInDetails signInDto)
     {
         var result = await accountService.SignInAsync(signInDto, true, HttpContext.RequestAborted);

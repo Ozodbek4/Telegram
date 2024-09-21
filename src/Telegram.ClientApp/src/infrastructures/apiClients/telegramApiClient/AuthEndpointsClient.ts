@@ -3,6 +3,7 @@ import type { ApiClientBase } from "../apiClientBase/services/ApiClientBase";
 import type { IdentityToken } from "@/modules/models/IdentityToken";
 import type { SignUpDetails } from "@/modules/models/SignUpDetails";
 import { User } from "@/modules/models/User";
+import type { head } from "node_modules/axios/index.cjs";
 
 export class AuthEndpointsClient {
     public client: ApiClientBase;
@@ -17,12 +18,12 @@ export class AuthEndpointsClient {
     }
 
     public async signUpAsync(signUpDetails: SignUpDetails) {
-        const endpointUrl = "signup";
+        const endpointUrl = "sign-up";
         return await this.client.postAsync(endpointUrl, signUpDetails);
     }
 
     public async singInAsync(signInDetails: SignInDetails) {
-        const endpointUrl = "signin";
+        const endpointUrl = "sign-in";
         return (await this.client.postAsync<IdentityToken>(endpointUrl, signInDetails));
     }
 }

@@ -35,8 +35,8 @@ public class MessageController(IMessageService messageService, IChatService chat
         return Ok(result);
     }
 
-    [HttpPost]
-    public async ValueTask<IActionResult> Create(Guid receiverId, string body)
+    [HttpPost("{receiverId:guid}")]
+    public async ValueTask<IActionResult> Create([FromRoute] Guid receiverId, [FromBody] string body)
     {
         var result = await chatOrchestrationService
             .SaveMessageToChatAsync(new Message { SenderId = GetRequestUserId(), ReceiverId = receiverId, Body = body }, true, HttpContext.RequestAborted);

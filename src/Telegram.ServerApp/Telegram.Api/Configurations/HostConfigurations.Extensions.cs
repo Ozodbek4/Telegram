@@ -42,6 +42,15 @@ public static partial class HostConfigurations
 
     private static WebApplicationBuilder AddExposers(this WebApplicationBuilder builder)
     {
+        builder.Services.AddCors(option =>
+        {
+            option.AddPolicy("AllowSpecificOrigin",
+            builder => builder.WithOrigins("http://localhost:7029") // Adjust to your frontend URL
+                              .AllowAnyHeader()
+                              .AllowAnyMethod()
+                              .AllowCredentials());
+        });
+
         builder.Services
             .AddRouting(options => options.LowercaseUrls = true)
             .AddControllers();
@@ -66,6 +75,7 @@ public static partial class HostConfigurations
             .UseAuthorization()
             .UseRouting()
             .UseHsts()
+            .UseCors("AllowSpecificOrigin")
             .UseHttpsRedirection();
 
         app

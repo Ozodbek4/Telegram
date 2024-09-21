@@ -4,7 +4,7 @@ import { ApiResponse } from "../models/ApiResponse";
 import axios, {HttpStatusCode} from "axios";
 import type { ProblemDetails } from "../models/ProblemDetails";
 
-export class ApiClientBase{
+export class ApiClientBase {
     public readonly client!: AxiosInstance;
     private readonly localStorage: LocalStorageService;
     public mapResponse!: <T>(response: ApiResponse<T>) => ApiResponse<T>
@@ -42,20 +42,19 @@ export class ApiClientBase{
       );
     }
 
-
-    public async getAsync<T>(url: string): Promise<ApiResponse<T>> {
-        return (await this.client.get<ApiResponse<T>>(url)).data;
+    public async getAsync<T>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+        return (await this.client.get<ApiResponse<T>>(url, config)).data;
     }
 
-    public async postAsync<T>(url: string, data?: any): Promise<ApiResponse<T>> {
-        return (await this.client.post<ApiResponse<T>>(url, data)).data;
+    public async postAsync<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+        return (await this.client.post<ApiResponse<T>>(url, data, config)).data;
     }
 
-    public async putAsync<T>(url: string, data?: any): Promise<ApiResponse<T>> {
-        return (await this.client.put<ApiResponse<T>>(url, data)).data;
+    public async putAsync<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+        return (await this.client.put<ApiResponse<T>>(url, data, config)).data;
     }
 
-    public async deleteAsync<T>(url: string): Promise<ApiResponse<T>> {
-        return (await this.client.delete<ApiResponse<T>>(url)).data;
+    public async deleteAsync<T>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+        return (await this.client.delete<ApiResponse<T>>(url, config)).data;
     }
 }

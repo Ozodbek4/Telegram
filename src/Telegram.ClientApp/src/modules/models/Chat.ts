@@ -1,16 +1,16 @@
-import type { Message } from "postcss";
+import type { Message } from "./Message";
 import type { User } from "./User";
 
 export class Chat {
     public id!: string;
 
-    public FirstUserUnReadMessageCount!: number;
+    public firstUserUnReadMessageCount!: number;
 
-    public SecondUserUnReadMessageCount!: number;
+    public secondUserUnReadMessageCount!: number;
 
-    public LastMessage!: Message;
+    public lastMessage!: Message;
 
-    public FirstUser!: User;
+    public firstUser!: User;
 
-    public SecondUser!: User;
+    public secondUser!: User;
 }

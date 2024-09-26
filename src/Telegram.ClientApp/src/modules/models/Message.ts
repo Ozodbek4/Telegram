@@ -1,15 +1,15 @@
 export class Message {
     public id!: string;
 
-    public SenderId!: string;
+    public senderId!: string;
 
-    public ReceiverId!: string;
+    public receiverId!: string;
 
-    public ChatId!: string;
+    public chatId!: string;
 
-    public CreatedDate!: TimeRanges;
+    public createdDate!: TimeRanges;
 
-    public Body!: string;
+    public body!: string;
 
-    public IsSeen!: boolean;
+    public isSeen!: boolean;
 }

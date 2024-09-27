@@ -1,6 +1,4 @@
-﻿using Telegram.Domain.Entities;
-
-namespace Telegram.Api.Models.Dtos;
+﻿namespace Telegram.Api.Models.Dtos;
 
 public class ChatDto
 {
@@ -10,9 +8,9 @@ public class ChatDto
 
     public int SecondUserUnReadMessageCount { get; set; }
 
-    public Message LastMessage { get; set; }
+    public MessageDto LastMessage { get; set; }
 
-    public User FirstUser { get; set; }
+    public UserDto FirstUser { get; set; }
 
-    public User SecondUser { get; set; }
+    public UserDto SecondUser { get; set; }
 }

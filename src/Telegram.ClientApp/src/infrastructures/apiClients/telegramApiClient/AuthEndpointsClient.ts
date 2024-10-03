@@ -3,7 +3,6 @@ import type { ApiClientBase } from "../apiClientBase/services/ApiClientBase";
 import type { IdentityToken } from "@/modules/models/IdentityToken";
 import type { SignUpDetails } from "@/modules/models/SignUpDetails";
 import { User } from "@/modules/models/User";
-import type { head } from "node_modules/axios/index.cjs";
 
 export class AuthEndpointsClient {
     public client: ApiClientBase;

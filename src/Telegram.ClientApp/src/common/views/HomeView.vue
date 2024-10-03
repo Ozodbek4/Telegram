@@ -1,8 +1,19 @@
 <script setup lang="ts">
-import SignIn from '@/modules/components/SignIn.vue';
-import BaseView from '../components/BaseView.vue'
+import router from '@/infrastructures/router';
+import { onMounted } from 'vue';
+import { RouterView } from 'vue-router'
+
+
+function intialMethod(){
+    router.push({name: 'Login'})
+}
+
+onMounted(() => {
+    intialMethod();
+})
+
 </script>
 
 <template>
-    <BaseView></BaseView>
+    <RouterView></RouterView>
 </template>

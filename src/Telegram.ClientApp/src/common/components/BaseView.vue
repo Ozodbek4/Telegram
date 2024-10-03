@@ -58,7 +58,7 @@
                     :class="{'justify-end bg-white ml-auto': mes.senderId == myId, 'justify-start bg-blue-500 mr-auto': mes.receiverId == myId }"
                     class="max-w-xs p-4 rounded-lg shadow-lg">
                         <p class="text-sm">{{ mes.body }}</p>
-                        <div v-if="mes.receiverId == myId" class="flex justify-end text-gray-500 text-xs">
+                        <div v-if="mes.senderId == myId" class="flex justify-end text-gray-500 text-xs">
                             <span class="ml-1">{{ mes.isSeen ? 'seen' : 'sended' }}</span>
                         </div>
                     </div>

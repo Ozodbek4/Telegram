@@ -45,7 +45,7 @@ public static partial class HostConfigurations
         builder.Services.AddCors(option =>
         {
             option.AddPolicy("AllowSpecificOrigin",
-            builder => builder.WithOrigins("http://localhost:7029") // Adjust to your frontend URL
+            builder => builder.WithOrigins("http://localhost:5173") // Adjust to your frontend URL
                               .AllowAnyHeader()
                               .AllowAnyMethod()
                               .AllowCredentials());
@@ -75,7 +75,7 @@ public static partial class HostConfigurations
             .UseAuthorization()
             .UseRouting()
             .UseHsts()
-            .UseCors("AllowSpecificOrigin")
+            .UseCors()
             .UseHttpsRedirection();
 
         app

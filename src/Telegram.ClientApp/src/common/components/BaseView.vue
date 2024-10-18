@@ -29,8 +29,8 @@
                             <h3 class="text-lg font-medium">{{  chat.secondUser.id == myId ?  chat.firstUser.firstName : chat.secondUser.firstName  }} {{ chat.secondUser.id == myId ?  chat.firstUser.lastName : chat.secondUser.lastName }}</h3>
                             <p class="text-sm text-gray-500">{{ chat.lastMessage.body }}</p>
                         </div>
-                        <div class="ml-auto text-xs text-gray-400">
-                            {{ chat.lastMessage.createdDate }}
+                        <div v-if="chat.unReadMessagesCount" class="min-w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
+                            <span class="text-white text-base p-2">{{ chat.unReadMessagesCount }}</span>
                         </div>
                     </div>
 
@@ -110,6 +110,7 @@ type customChat = {
         emailAddress: string
     },
     lastMessage: customMessage,
+    unReadMessagesCount: number
 }
 const myId = "1";
 const newMessage = ref("");
@@ -143,6 +144,7 @@ const chatFirst: customChat = {
         createdDate:  "2days ago",
         isSeen: false
     },
+    unReadMessagesCount: 0
 }
 const chatSecond : customChat = {
     id: "2",
@@ -170,7 +172,8 @@ const chatSecond : customChat = {
         body: "Qalaysan uka Man Sarivnozman. San Ozodbeksan",
         createdDate:  "1day ago",
         isSeen: true
-    }
+    },
+    unReadMessagesCount: 2
 }
 
 const chats = ref<customChat[]>([chatFirst, chatSecond])
@@ -221,7 +224,6 @@ function sendMessage(mes: string, chat: customChat) {
     })
 
     newMessage.value = ""
-    console.log("MEssages is worked")
 }
 function showChatMessages(chat: customChat): customMessage[]
 {

@@ -7,6 +7,7 @@
                     <label for="text" class="block text-sm font-medium text-gray-700 mb-1">User name</label>
                     <input type="text"
                         placeholder="Enter your user name"
+                        required
                         v-model="signInDetails.userName"
                         class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-200">
                 </div>
@@ -14,6 +15,7 @@
                     <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
                     <input type="password"
                         placeholder="Enter your password"
+                        required
                         v-model="signInDetails.password"
                         class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-200">
                 </div>

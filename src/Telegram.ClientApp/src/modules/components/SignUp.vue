@@ -6,6 +6,7 @@
                 <div class="mb-4">
                     <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                     <input type="email"
+                        required
                         v-model="signUpDetails.emailAddress"
                         placeholder="Enter your email"
                         class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-200">
@@ -13,6 +14,7 @@
                 <div class="mb-4">
                     <label for="firstname" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
                     <input type="text"
+                        required
                         v-model="signUpDetails.firstName"
                         placeholder="Enter your first name"
                         class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-200">
@@ -20,6 +22,7 @@
                 <div class="mb-4">
                     <label for="lastname" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
                     <input type="text"
+                        required
                         v-model="signUpDetails.lastName"
                         placeholder="Enter your last name"
                         class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-200">
@@ -27,6 +30,7 @@
                 <div class="mb-4">
                     <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
                     <input type="text"
+                        required
                         v-model="signUpDetails.userName"
                         placeholder="Enter your user name"
                         class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-200">
@@ -34,6 +38,7 @@
                 <div class="mb-6">
                     <label for="password"class="block text-sm font-medium text-gray-700 mb-1">Password</label>
                     <input type="password"
+                        required
                         v-model="signUpDetails.password"
                         placeholder="Enter your password"
                         class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-200">

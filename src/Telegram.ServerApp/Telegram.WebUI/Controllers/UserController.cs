@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Telegram.Application.Common.Models;
 using Telegram.Application.Services;
@@ -21,7 +22,7 @@ public class UserController(IUserService userService, IMapper mapper) : BaseCont
 
         HttpContext.AddPaginationMetaData(exists.PaginationInfo);
 
-        return Ok(exists.Data);
+        return Ok(mapper.Map<IEnumerable<UserViewModel>>(exists.Data));
     }
 
     [HttpGet("{id:long}")]

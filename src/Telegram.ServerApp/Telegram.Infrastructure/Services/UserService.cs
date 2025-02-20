@@ -49,6 +49,8 @@ public class UserService(
     {
         var exists = await unitOfWork.Users.CreateAsync(mapper.Map<User>(user), cancellationToken);
 
+        exists.Password = await passwordHasherService.HashPassword(user.Password);
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return exists;

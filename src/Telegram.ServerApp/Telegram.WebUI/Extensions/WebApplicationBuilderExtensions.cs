@@ -1,11 +1,15 @@
-﻿using Telegram.Infrastructure;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Reflection;
+using System.Text;
+using Telegram.Application.Settings;
+using Telegram.Infrastructure;
 using Telegram.Persistence;
 using Telegram.WebUI.ExceptionHandlers;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Telegram.WebUI.Middlewares;
-using System.Reflection;
 
 namespace Telegram.WebUI.Extensions;
 
@@ -13,7 +17,7 @@ public static class WebApplicationBuilderExtensions
 {
     public static WebApplicationBuilder AddWebApplicationBuilder(this WebApplicationBuilder builder)
     {
-        builder.Services.AddPresentation();
+        builder.Services.AddPresentation(builder.Configuration);
         builder.Services.AddInfrastructure(builder.Configuration);
         builder.Services.AddPersistence(builder.Configuration);
 
@@ -21,12 +25,13 @@ public static class WebApplicationBuilderExtensions
     }
 
     #region
-    private static IServiceCollection AddPresentation(this IServiceCollection services)
+    private static IServiceCollection AddPresentation(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDevTools();
         services.AddExposers();
         services.AddSwagger();
         services.AddMapper();
+        services.AddSecurity(configuration);
 
         return services;
     }
@@ -94,6 +99,32 @@ public static class WebApplicationBuilderExtensions
     private static IServiceCollection AddMapper(this IServiceCollection services)
     {
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
+        return services;
+    }
+
+    private static IServiceCollection AddSecurity(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<JwtSettings>(configuration.GetSection(nameof(JwtSettings)));
+        var jwtSettings = configuration.GetSection(nameof(JwtSettings)).Get<JwtSettings>()
+            ?? throw new InvalidOperationException($"{nameof(JwtSettings)} is not configurated.");
+
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        }).AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = jwtSettings.ValidateIssuer,
+                ValidIssuer = jwtSettings.ValidIssuer,
+                ValidAudience = jwtSettings.ValidAudience,
+                ValidateAudience = jwtSettings.ValidateAudience,
+                ValidateLifetime = jwtSettings.ValidateLifeTime,
+                ValidateIssuerSigningKey = jwtSettings.ValidateIssuerSigningKey,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey))
+            };
+        });
 
         return services;
     }

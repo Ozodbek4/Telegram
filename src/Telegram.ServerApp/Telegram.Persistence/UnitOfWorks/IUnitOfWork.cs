@@ -8,6 +8,10 @@ public interface IUnitOfWork : IDisposable
     // repositories
     IRepository<User> Users { get; }
 
+    IRepository<ChatRoom> ChatRooms { get; }
+    
+    IRepository<Message> Messages { get; }
+
     // methods
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 

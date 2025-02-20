@@ -1,8 +1,6 @@
-﻿using Telegram.Domain.Common.Entities;
+﻿namespace Telegram.WebUI.Models.Users;
 
-namespace Telegram.Domain.Entities;
-
-public class User : AuditableEntity
+public class CreateUserModel
 {
     public string FirstName { get; set; }
 

@@ -1,10 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Telegram.Domain.Common.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Telegram.Domain.Common.Entities;
 
 namespace Telegram.Persistence.Interceptors;
 
-public class AuditableInterceptor : SaveChangesInterceptor
+internal class AuditableInterceptor : SaveChangesInterceptor
 {
     public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
     {
@@ -13,13 +13,17 @@ public class AuditableInterceptor : SaveChangesInterceptor
         auditableEntry.ForEach(entry =>
         {
             if (entry.State == EntityState.Added)
-            {
-                entry.Property(nameof(IAuditableEntity.CreatedDate)).CurrentValue = DateTimeOffset.UtcNow;
-                entry.Property(nameof(IAuditableEntity.Id)).CurrentValue = Guid.NewGuid();
-            }
+                entry.Property(nameof(IAuditableEntity.CreatedAt)).CurrentValue = DateTime.UtcNow;
 
             if (entry.State == EntityState.Modified)
-                entry.Property(nameof(IAuditableEntity.ModifiedDate)).CurrentValue = DateTimeOffset.UtcNow;
+                entry.Property(nameof(IAuditableEntity.UpdatedAt)).CurrentValue = DateTime.UtcNow;
+
+            if (entry.State != EntityState.Deleted)
+                return;
+
+            entry.Property(nameof(IAuditableEntity.DeletedAt)).CurrentValue = DateTime.UtcNow;
+            entry.Property(nameof(IAuditableEntity.IsDeleted)).CurrentValue = true;
+            entry.State = EntityState.Modified;
         });
 
         return base.SavingChangesAsync(eventData, result, cancellationToken);

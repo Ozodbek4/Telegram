@@ -1,9 +1,14 @@
-﻿
-namespace Telegram.Domain.Common.Entities;
+﻿namespace Telegram.Domain.Common.Entities;
 
-public class AuditableEntity : Entity, IAuditableEntity
+public class AuditableEntity : IAuditableEntity
 {
-    public DateTimeOffset CreatedDate { get; set; }
+    public long Id { get; set; }
 
-    public DateTimeOffset? ModifiedDate { get; set; }
+    public DateTime CreatedAt { get; set; }
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public DateTime? DeletedAt { get; set; }
+
+    public bool IsDeleted { get; set; }
 }

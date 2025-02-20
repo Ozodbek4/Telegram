@@ -20,7 +20,11 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IRepository<User>, Repository<User>>();
+        //services.AddScoped<IRepository<ChatRoom>, Repository<ChatRoom>>();
+        //services.AddScoped<IRepository<Message>, Repository<Message>>();
 
         return services;
     }

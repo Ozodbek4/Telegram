@@ -8,14 +8,23 @@ public class UnitOfWork : IUnitOfWork
 {
     private readonly AppDbContext _context;
 
-    public UnitOfWork(AppDbContext appDbContext, IRepository<User> users)
+    public UnitOfWork(AppDbContext appDbContext,
+        IRepository<User> users,
+        IRepository<ChatRoom> chatRooms,
+        IRepository<Message> messages)
     {
         _context = appDbContext;
         Users = users;
+        ChatRooms = chatRooms;
+        Messages = messages;
     }
 
     // repositories
     public IRepository<User> Users { get; }
+
+    public IRepository<ChatRoom> ChatRooms { get; }
+    
+    public IRepository<Message> Messages { get; }
 
     // methods
     public void Dispose() =>

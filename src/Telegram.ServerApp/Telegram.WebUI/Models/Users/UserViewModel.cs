@@ -9,4 +9,6 @@ public class UserViewModel
     public string LastName { get; set; }
 
     public string UserName { get; set; }
+
+    public bool IsOnline { get; set; }
 }

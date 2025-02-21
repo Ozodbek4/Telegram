@@ -1,10 +1,17 @@
-﻿using Telegram.Application.Common.Models;
+﻿using System.Linq.Expressions;
+using Telegram.Application.Common.Models;
 using Telegram.Domain.Entities;
 
 namespace Telegram.Application.Services;
 
 public interface IUserService
 {
+    IQueryable<User> GetUsers(
+        Expression<Func<User, bool>>? expression = default,
+        string[]? includes = null,
+        bool asNoTracking = true
+        );
+
     Task<PaginationResult<User>> GetAllAsync(
         PaginationParameters pagination,
         SortingParameters sorting,

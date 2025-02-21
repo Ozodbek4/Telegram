@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using Telegram.Application.Common.Exceptions;
 using Telegram.Application.Services;
 using Telegram.Domain.Entities;
@@ -7,7 +6,7 @@ using Telegram.Persistence.UnitOfWorks;
 
 namespace Telegram.Infrastructure.Services;
 
-public class MessageService(IUnitOfWork unitOfWork, IMapper mapper, IChatRoomService chatRoomService) : IMessageService
+public class MessageService(IUnitOfWork unitOfWork, IChatRoomService chatRoomService) : IMessageService
 {
     public IQueryable<Message> Get(
         Expression<Func<Message, bool>>? expression = null,

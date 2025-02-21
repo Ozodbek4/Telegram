@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using System.Linq.Expressions;
 using Telegram.Application.Common.Exceptions;
 using Telegram.Application.Common.Extensions;
 using Telegram.Application.Common.Identity;
@@ -14,6 +15,11 @@ public class UserService(
     IMapper mapper,
     IPasswordHasherService passwordHasherService) : IUserService
 {
+    public IQueryable<User> GetUsers(Expression<Func<User, bool>>? expression = null, string[]? includes = null, bool asNoTracking = true)
+    {
+        return unitOfWork.Users.SelectAsQueryable(expression, includes, asNoTracking);
+    }
+    
     public Task<PaginationResult<User>> GetAllAsync(
         PaginationParameters pagination,
         SortingParameters sorting,
@@ -59,12 +65,13 @@ public class UserService(
     public async Task<User> UpdateAsync(User user, CancellationToken cancellationToken = default)
     {
         var exists = await GetByIdAsync(user.Id, asNoTracking: false, cancellationToken: cancellationToken);
-        var mapped = mapper.Map(user, exists);
+        exists.FirstName = user.FirstName;
+        exists.LastName = user.LastName;
+        exists.UserName = user.UserName;
 
-        mapped.Password = await passwordHasherService.HashPassword(user.Password);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return mapped;
+        return exists;
     }
 
     public async Task<bool> DeleteAsync(long id, CancellationToken cancellationToken = default)

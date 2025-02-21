@@ -12,7 +12,7 @@ using Telegram.Persistence.DataContexts;
 namespace Telegram.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250220194258_InitialMigration")]
+    [Migration("20250221102349_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -137,6 +137,9 @@ namespace Telegram.Persistence.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsOnline")
                         .HasColumnType("bit");
 
                     b.Property<string>("LastName")

@@ -56,12 +56,12 @@
 import router from '@/infrastructures/router';
 import { SignUpDetails } from '../models/SignUpDetails';
 import SignIn from './SignIn.vue';
+import axios from 'axios';
 
 
 var signUpDetails = new SignUpDetails();
 
-const signUp = () => {
-    
+async function signUp () {
     router.push({name:'Login'})
 }
 

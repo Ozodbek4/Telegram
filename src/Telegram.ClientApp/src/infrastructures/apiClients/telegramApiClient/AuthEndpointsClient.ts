@@ -22,7 +22,7 @@ export class AuthEndpointsClient {
     }
 
     public async singInAsync(signInDetails: SignInDetails) {
-        const endpointUrl = "sign-in";
-        return (await this.client.postAsync<IdentityToken>(endpointUrl, signInDetails));
+        const endpointUrl = `sign-in?UserName=${signInDetails.userName}&Password=${signInDetails.password}`;
+        return (await this.client.postAsync<IdentityToken>(endpointUrl));
     }
 }

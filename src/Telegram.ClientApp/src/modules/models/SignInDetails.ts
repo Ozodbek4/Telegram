@@ -1,5 +1,5 @@
 export class SignInDetails{
-    public userName!: string;
+    public userName?: string;
 
-    public password!: string;
+    public password?: string;
 }

@@ -14,8 +14,8 @@ export class ChatEndpointsClient{
     }
 
     public async post(secondUserId: string) {
-        const endpointUrl = "api/chat";
-        return await this.client.postAsync<Chat>(endpointUrl, secondUserId);
+        const endpointUrl = `api/chat/${secondUserId}`;
+        return await this.client.postAsync<Chat>(endpointUrl);
     }
 
     public async delete(secondUserId: string){

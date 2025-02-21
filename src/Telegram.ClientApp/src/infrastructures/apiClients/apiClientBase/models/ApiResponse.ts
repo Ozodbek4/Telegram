@@ -2,12 +2,12 @@ import type { ProblemDetails } from "./ProblemDetails";
 
 export class ApiResponse<T> {
     public response: T | null;
-    public error: ProblemDetails | null;
+    public problem: ProblemDetails | null;
     public status: number;
 
-    constructor(response: T | null, error: ProblemDetails | null, status: number) {
+    constructor(response: T | null, problem: ProblemDetails | null, status: number) {
         this.response = response;
-        this.error = error;
+        this.problem = problem;
         this.status = status;
     }
 

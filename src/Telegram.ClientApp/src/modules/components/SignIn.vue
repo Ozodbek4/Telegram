@@ -31,11 +31,16 @@
 <script setup lang="ts">
 import router from '@/infrastructures/router';
 import { SignInDetails } from '../models/SignInDetails';
+import { TelegramApiClient } from '@/infrastructures/apiClients/telegramApiClient/TelegramApiClient';
+import { ref } from 'vue';
+import client from '@/services/TelegramApiClientService'
 
 var signInDetails = new SignInDetails()
-
-const signIn = () => {
-    router.push({name: "Home"})
+async function signIn(){
+    // var result = await client.auth.singInAsync(signInDetails)
+     if (true){
+         router.push({name: "Home"})
+     }
 }
 
 const signUp = () => {

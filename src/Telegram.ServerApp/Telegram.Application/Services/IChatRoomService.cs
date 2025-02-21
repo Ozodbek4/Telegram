@@ -11,6 +11,13 @@ public interface IChatRoomService
         bool asNoTracking = true
         );
 
+    Task<ChatRoom> GetByIdAsync(
+        long id,
+        string[]? includes = null,
+        bool asNoTracking = true,
+        CancellationToken cancellationToken = default
+        );
+
     Task<IEnumerable<ChatRoom>> GetByUserIdAsync(
         long userId,
         string[]? includes = null,

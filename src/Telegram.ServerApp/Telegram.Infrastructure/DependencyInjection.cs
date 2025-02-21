@@ -39,6 +39,7 @@ public static class DependencyInjection
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IChatRoomService, ChatRoomService>();
         services.AddScoped<IMessageService, MessageService>();
+        services.AddScoped<IChatOrchestrationService, ChatOrchestrationService>();
 
         return services;
     }

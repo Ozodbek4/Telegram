@@ -18,6 +18,19 @@ public class ChatRoomService(IUnitOfWork unitOfWork, IMapper mapper) : IChatRoom
         return unitOfWork.ChatRooms.SelectAsQueryable(expression, includes, asNoTracking);
     }
 
+    public async Task<ChatRoom> GetByIdAsync(
+        long id,
+        string[]? includes = null,
+        bool asNoTracking = true,
+        CancellationToken cancellationToken = default
+        )
+    {
+        var exists = await unitOfWork.ChatRooms.SelectAsync(entity => entity.Id == id, includes, asNoTracking, cancellationToken)
+            ?? throw new NotFoundException(nameof(ChatRoom), id);
+
+        return exists;
+    }
+
     public async Task<IEnumerable<ChatRoom>> GetByUserIdAsync(
         long userId,
         string[]? includes = null,

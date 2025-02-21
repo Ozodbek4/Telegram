@@ -8,7 +8,15 @@ namespace Telegram.WebUI.Controllers;
 
 public class ChatRoomController(IChatRoomService chatRoomService, IMapper mapper) : BaseController
 {
-    [HttpGet("{userId:long}")]
+    [HttpGet("{id:long}")]
+    public async ValueTask<IActionResult> Get([FromRoute] long id)
+    {
+        var exist = await chatRoomService.GetByIdAsync(id, ["FirstUser", "SecondUser", "LastMessage"], cancellationToken: HttpContext.RequestAborted);
+
+        return Ok(mapper.Map<ChatRoomViewModel>(exist));
+    }
+
+    [HttpGet("user/{userId:long}")]
     public async ValueTask<IActionResult> GetAll(long userId)
     {
         var entities = await chatRoomService.GetByUserIdAsync(userId, ["FirstUser", "SecondUser", "LastMessage"]);

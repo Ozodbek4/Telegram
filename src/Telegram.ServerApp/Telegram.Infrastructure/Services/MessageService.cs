@@ -47,8 +47,14 @@ public class MessageService(IUnitOfWork unitOfWork, IChatRoomService chatRoomSer
 
     public async Task<Message> CreateAsync(Message message, CancellationToken cancellationToken = default)
     {
-        message.ChatRoomId = (await chatRoomService.GetByUsersIdAsync(message.SenderId, message.ReceiverId)).Id;
+        var chatRoom = await chatRoomService.GetByUsersIdAsync(message.SenderId, message.ReceiverId, asNoTracking: false);
 
+        if (chatRoom.FirstUserId == message.ReceiverId)
+            chatRoom.FirstUserUnreadMessageCount++;
+        else if (chatRoom.SecondUserId == message.ReceiverId)
+            chatRoom.SecondUserUnreadMessageCount++;
+
+        message.ChatRoomId = chatRoom.Id;
         var exist = await unitOfWork.Messages.CreateAsync(message, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 

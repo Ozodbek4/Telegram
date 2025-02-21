@@ -6,7 +6,7 @@ using Telegram.WebUI.Models.Messages;
 
 namespace Telegram.WebUI.Controllers;
 
-public class MessageController(IMessageService messageService, IMapper mapper) : BaseController
+public class MessageController(IMessageService messageService, IMapper mapper, IChatOrchestrationService orchestrationService) : BaseController
 {
     [HttpGet("{id:long}")]
     public async ValueTask<IActionResult> Get([FromRoute] long id)
@@ -39,6 +39,14 @@ public class MessageController(IMessageService messageService, IMapper mapper) :
         var exist = await messageService.UpdateAsync(mapper.Map<Message>(model), HttpContext.RequestAborted);
 
         return Ok(mapper.Map<MessageViewModel>(exist));
+    }
+
+    [HttpPut("mark-as-seen/{chatRoomId:long}/{userId:long}")]
+    public async ValueTask<IActionResult> Put([FromRoute] long chatRoomId, [FromRoute] long userId)
+    {
+        var result = await orchestrationService.MarkMessageAsSeenAsync(chatRoomId, userId);
+
+        return Ok(result);
     }
 
     [HttpDelete("{id:long}")]

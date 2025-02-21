@@ -1,4 +1,6 @@
-﻿namespace Telegram.WebUI.Extensions;
+﻿using Telegram.WebUI.Hubs;
+
+namespace Telegram.WebUI.Extensions;
 
 public static class WebApplicationExtensions
 {
@@ -12,8 +14,14 @@ public static class WebApplicationExtensions
         app.UseAuthentication();
         app.UseAuthorization();
 
+        app.MapHub<ChatHub>("chat-hub");
+
         app.UseSwagger();
         app.UseSwaggerUI();
+
+        app.UseCors("AllowAllOrigins");
+
+        app.UseWebSockets();
 
         app.MapControllers();
 

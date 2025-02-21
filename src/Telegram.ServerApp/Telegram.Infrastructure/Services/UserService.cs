@@ -68,6 +68,7 @@ public class UserService(
         exists.FirstName = user.FirstName;
         exists.LastName = user.LastName;
         exists.UserName = user.UserName;
+        exists.IsOnline = user.IsOnline;
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 

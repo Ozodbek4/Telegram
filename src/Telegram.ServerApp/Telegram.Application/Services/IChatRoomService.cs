@@ -11,7 +11,7 @@ public interface IChatRoomService
         bool asNoTracking = true
         );
 
-    Task<IEnumerable<ChatRoom>> GetByUserId(
+    Task<IEnumerable<ChatRoom>> GetByUserIdAsync(
         long userId,
         string[]? includes = null,
         bool asNoTracking = true,

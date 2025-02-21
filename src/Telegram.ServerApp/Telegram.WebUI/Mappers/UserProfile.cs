@@ -4,9 +4,9 @@ using Telegram.WebUI.Models.Users;
 
 namespace Telegram.WebUI.Mappers;
 
-public class UserMapper : Profile
+public class UserProfile : Profile
 {
-    public UserMapper()
+    public UserProfile()
     {
         CreateMap<CreateUserModel, User>();
         CreateMap<UpdateUserModel, User>();

@@ -37,6 +37,8 @@ public static class DependencyInjection
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IChatRoomService, ChatRoomService>();
+        services.AddScoped<IMessageService, MessageService>();
 
         return services;
     }

@@ -18,7 +18,7 @@ public class ChatRoomService(IUnitOfWork unitOfWork, IMapper mapper) : IChatRoom
         return unitOfWork.ChatRooms.SelectAsQueryable(expression, includes, asNoTracking);
     }
 
-    public async Task<IEnumerable<ChatRoom>> GetByUserId(
+    public async Task<IEnumerable<ChatRoom>> GetByUserIdAsync(
         long userId,
         string[]? includes = null,
         bool asNoTracking = true,
@@ -43,17 +43,30 @@ public class ChatRoomService(IUnitOfWork unitOfWork, IMapper mapper) : IChatRoom
         var exist = await unitOfWork.ChatRooms
             .SelectAsync(entity => (entity.FirstUserId == firstUserId && entity.SecondUserId == secondUserId)
                 || (entity.FirstUserId == secondUserId && entity.SecondUserId == firstUserId),
-                includes, asNoTracking, cancellationToken);
+                includes, asNoTracking, cancellationToken)
+            ?? throw new NotFoundException(nameof(ChatRoom), firstUserId);
 
         return exist;
     }
 
     public async Task<ChatRoom> CreateAsync(ChatRoom chatRoom, CancellationToken cancellationToken = default)
-    {
-        var exist = await unitOfWork.ChatRooms.CreateAsync(chatRoom, cancellationToken);
+        {
+
+        if (chatRoom.FirstUserId == chatRoom.SecondUserId)
+            throw new ArgumentIsNotValidException("Chat room can not be with user id.");
+
+        var exist = await unitOfWork.ChatRooms
+            .SelectAsync(entity => (entity.FirstUserId == chatRoom.FirstUserId && entity.SecondUserId == chatRoom.SecondUserId)
+                || (entity.FirstUserId == chatRoom.SecondUserId && entity.SecondUserId == chatRoom.FirstUserId),
+                cancellationToken: cancellationToken);
+        if (exist is not null)
+            throw new AlreadyExistException(nameof(chatRoom), chatRoom.FirstUserId);
+
+        var created = await unitOfWork.ChatRooms.CreateAsync(chatRoom, cancellationToken);
+        
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return exist;
+        return created;
     }
 
     public async Task<ChatRoom> UpdateAsync(ChatRoom chatRoom, CancellationToken cancellationToken = default)

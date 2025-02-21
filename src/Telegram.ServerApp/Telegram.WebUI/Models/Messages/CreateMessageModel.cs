@@ -6,8 +6,6 @@ public class CreateMessageModel
 
     public long ReceiverId { get; set; }
 
-    public long ChatId { get; set; }
-
     public string Body { get; set; }
 
     public bool IsSeen { get; set; }

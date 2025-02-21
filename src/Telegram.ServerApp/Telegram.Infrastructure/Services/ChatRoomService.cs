@@ -32,7 +32,7 @@ public class ChatRoomService(IUnitOfWork unitOfWork, IMapper mapper) : IChatRoom
         return exists;
     }
 
-    public async Task<ChatRoom?> GetByUsersIdAsync(
+    public async Task<ChatRoom> GetByUsersIdAsync(
         long firstUserId,
         long secondUserId,
         string[]? includes = null,

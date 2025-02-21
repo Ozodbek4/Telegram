@@ -18,7 +18,7 @@ public interface IChatRoomService
         CancellationToken cancellationToken = default
         );
 
-    Task<ChatRoom?> GetByUsersIdAsync(
+    Task<ChatRoom> GetByUsersIdAsync(
         long firstUserId,
         long secondUserId,
         string[]? includes = null,

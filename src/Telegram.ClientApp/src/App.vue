@@ -5,6 +5,7 @@
 import { onMounted } from 'vue';
 import AuthApiClient from './infrastructure/http/AuthApiClient';
 import ChatRoomApiClient from './infrastructure/http/ChatRoomApiClient';
+import LocalStorageService from './infrastructure/services/LocalStorageService';
 
 
 async function fetchData() {

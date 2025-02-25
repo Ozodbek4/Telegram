@@ -1,5 +1,5 @@
 <template>
-    <SignUpView/>
+    <RouterView/>
 </template>
 
 <script lang="ts" setup>

@@ -8,11 +8,13 @@
 import type { SignUpModel } from '@/infrastructure/models/SignUpModel';
 import SignUpForm from '../components/SignUpForm.vue';
 import AuthApiClient from '@/infrastructure/http/AuthApiClient';
+import router from '@/infrastructure/router';
 
 async function signUp(details: SignUpModel){
     try{
         const response = await AuthApiClient.signUp(details);
         console.log(response);
+        router.push({name: 'Sign in'});
     }
     catch (error){
         console.error('Sign up fiailed', error);

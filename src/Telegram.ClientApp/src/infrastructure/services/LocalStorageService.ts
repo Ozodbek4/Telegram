@@ -12,7 +12,7 @@ class LocalStorageService {
         localStorage.removeItem(key);
     }
 
-    clear(key: string): void {
+    clear(): void {
         localStorage.clear();
     }
 }

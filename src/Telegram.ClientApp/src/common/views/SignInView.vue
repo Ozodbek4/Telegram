@@ -7,17 +7,11 @@
 <script lang="ts" setup>
 import type { SignInModel } from '@/infrastructure/models/SignInModel';
 import SignInForm from '../components/SignInForm.vue';
-import AuthApiClient from '@/infrastructure/http/AuthApiClient';
 import router from '@/infrastructure/router';
+import AuthService from '@/infrastructure/services/AuthService';
 
-async function signIn(details: SignInModel) {
-    try{
-        const response = await AuthApiClient.singIn(details);
-        console.log(response);
-    }
-    catch(error){
-        console.error(error)
-    }
+async function signIn(params: SignInModel) {
+    AuthService.signIn(params);
 }
 
 async function signUp() {

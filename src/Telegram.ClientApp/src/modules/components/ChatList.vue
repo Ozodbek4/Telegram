@@ -1,9 +1,19 @@
 <template>
-    <div class="scrollbar-hidden overflow-y-auto">
-        <ChatItem
-            v-for="chatRoom in chatRooms"
-            :key="chatRoom.id"
-            :chat="chatRoom"/>
+    <div class="flex flex-col lg:flex-row h-screen">
+        <div class="flex flex-col h-screen lg:w-1/4 bg-white border-r flex-shrink-0">
+            <div class="p-4 border-b flex items-center justify-between">
+                <h2 class="text-lg font-semibold">Chats</h2>
+            </div>
+
+            <SearchButton/>
+
+            <div class="scrollbar-hidden overflow-y-auto">
+                <ChatItem
+                    v-for="chatRoom in chatRooms"
+                    :key="chatRoom.id"
+                    :chat="chatRoom"/>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -14,6 +24,7 @@ import LocalStorageService from '@/infrastructure/services/LocalStorageService';
 import type { User } from '../models/User';
 import type { ChatRoom } from '../models/ChatRoom';
 import { onMounted, ref } from 'vue';
+import SearchButton from './SearchButton.vue';
 
 const me = LocalStorageService.get<User>('me');
 const chatRooms = ref<ChatRoom[]>([]);

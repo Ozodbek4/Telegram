@@ -8,24 +8,24 @@ public class ChatConfigurations : IEntityTypeConfiguration<ChatRoom>
 {
     public void Configure(EntityTypeBuilder<ChatRoom> builder)
     {
-        builder.HasOne(cr => cr.FirstUser)
+        builder.HasOne(chatRoom => chatRoom.FirstUser)
                .WithMany()
-               .HasForeignKey(cr => cr.FirstUserId)
+               .HasForeignKey(chatRoom => chatRoom.FirstUserId)
                .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(cr => cr.SecondUser)
+        builder.HasOne(chatRoom => chatRoom.SecondUser)
                .WithMany()
-               .HasForeignKey(cr => cr.SecondUserId)
+               .HasForeignKey(chatRoom => chatRoom.SecondUserId)
                .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(cr => cr.LastMessage)
-               .WithMany()
-               .HasForeignKey(cr => cr.LastMessageId)
-               .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasMany(cr => cr.Messages)
-               .WithOne(m => m.ChatRoom)
-               .HasForeignKey(m => m.ChatRoomId)
+        builder.HasMany(chatRoom => chatRoom.Messages)
+               .WithOne(message => message.ChatRoom)
+               .HasForeignKey(message => message.ChatRoomId)
                .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(chatRoom => chatRoom.LastMessage)
+               .WithMany()
+               .HasForeignKey(chatRoom => chatRoom.LastMessageId)
+               .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -8,19 +8,19 @@ public class MessageConfiguration : IEntityTypeConfiguration<Message>
 {
     public void Configure(EntityTypeBuilder<Message> builder)
     {
-        builder.HasOne(m => m.Sender)
+        builder.HasOne(message => message.Sender)
                .WithMany()
-               .HasForeignKey(m => m.SenderId)
+               .HasForeignKey(message => message.SenderId)
                .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(m => m.Receiver)
+        builder.HasOne(message => message.Receiver)
                .WithMany()
-               .HasForeignKey(m => m.ReceiverId)
+               .HasForeignKey(message => message.ReceiverId)
                .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(m => m.ChatRoom)
+        builder.HasOne(message => message.ChatRoom)
                .WithMany(cr => cr.Messages)
-               .HasForeignKey(m => m.ChatRoomId)
+               .HasForeignKey(message => message.ChatRoomId)
                .OnDelete(DeleteBehavior.Cascade);
     }
 }

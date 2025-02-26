@@ -12,7 +12,7 @@ using Telegram.Persistence.DataContexts;
 namespace Telegram.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250221102349_InitialMigration")]
+    [Migration("20250226213707_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />

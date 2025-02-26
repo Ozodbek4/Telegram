@@ -56,6 +56,9 @@ public class MessageService(IUnitOfWork unitOfWork, IChatRoomService chatRoomSer
 
         message.ChatRoomId = chatRoom.Id;
         var exist = await unitOfWork.Messages.CreateAsync(message, cancellationToken);
+
+        chatRoom.LastMessage = exist;
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return exist;

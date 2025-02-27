@@ -6,6 +6,7 @@
                 <span class="text-white font-semibold text-xl">{{ secondUser.userName.charAt(0) }}</span>
             </div>
             <p class="text-lg font-medium">{{ secondUser.firstName }}</p>
+            <p class="text-sm" :class="secondUser.isOnline ? 'text-green-300': 'text-gray-300'">{{ secondUser.isOnline ? 'Online' : 'Offline' }}</p>
         </div>
 
         <!-- Messages -->
@@ -15,8 +16,8 @@
 
         <!-- Input -->
         <div class="p-4 bg-white border-t flex items-center">
-            <input type="text" v-model="newMessage" placeholder="Write a message..." class="w-full p-2 focus:outline-none">
-            <button @click="sendMessage(newMessage, activeChat)" class="p-2 bg-blue-500 rounded hover:bg-blue-600 transition duration-200">Send</button>
+            <input type="text" v-model="newMessageBase" placeholder="Write a message..." class="w-full p-2 focus:outline-none">
+            <button @click="sendMessage(newMessageBase, activeChat)" class="p-2 bg-blue-500 rounded hover:bg-blue-600 transition duration-200">Send</button>
         </div>
     </div>
 </template>
@@ -33,7 +34,7 @@ import type { CreateMessageModel } from '@/infrastructure/models/CreateMessageMo
 
 const proms = defineProps<{ activeChat: ChatRoom }>();
 
-const newMessage = ref("");
+const newMessageBase = ref("");
 const me = LocalStorageService.get<User>('me');
 const isMe = computed(() => proms.activeChat.firstUserId == me?.id);
 const secondUser = computed(() => isMe.value ? proms.activeChat.secondUser : proms.activeChat.firstUser);
@@ -53,7 +54,7 @@ const sendMessage = async (newMessage: string, activeChat: ChatRoom) => {
     mes.value.receiverId = secondUser.value.id;
 
     const reponse = await MessageApiClient.post(mes.value);
-    console.log(reponse);
+    newMessageBase.value = "";
 }
 
 onMounted(messagesFunc);

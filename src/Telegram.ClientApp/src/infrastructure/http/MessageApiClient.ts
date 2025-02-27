@@ -8,7 +8,15 @@ class MessageApiClient {
     }
 
     async getByChatRoomId(chatRoomId: number) {
-        return axiosInstance.get(`api/message/chat-room/${chatRoomId}`);
+        return axiosInstance.get(`api/message/chat-room/${chatRoomId}`, {
+            params: {
+                PageNumber: 1,
+                PageSize: 200,
+                SortBy: `id`,
+                SortType: `desc`,
+                search: null,
+            }
+        });
     }
 
     async post(request: CreateMessageModel) {

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Telegram.Application.Common.Models;
 using Telegram.Application.Services;
 using Telegram.Domain.Entities;
 using Telegram.WebUI.Models.Messages;
@@ -17,7 +18,12 @@ public class MessageController(IMessageService messageService, IMapper mapper, I
     }
 
     [HttpGet("chat-room/{id:long}")]
-    public async ValueTask<IActionResult> GetByChatRoomId([FromRoute] long id)
+    public async ValueTask<IActionResult> GetByChatRoomId(
+        [FromRoute] long id,
+        [FromQuery] PaginationParameters pagination,
+        [FromQuery] SortingParameters sorting,
+        [FromQuery] string? search = null
+        )
     {
         var exist = await messageService.GetByChatRoomIdAsync(id, ["Sender", "Receiver"]);
 

@@ -17,4 +17,6 @@ public class MessageViewModel
     public string Body { get; set; }
 
     public bool IsSeen { get; set; }
+
+    public DateTime CreatedAt { get; set; }
 }

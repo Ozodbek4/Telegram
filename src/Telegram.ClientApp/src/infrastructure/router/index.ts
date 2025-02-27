@@ -11,7 +11,7 @@ const router = createRouter({
         {
             path: '/home',
             name: 'Home',
-            component: () => import('../../modules/views/HomeView.vue'),
+            component: () => import('../../modules/views/ChatView.vue'),
         },
         {
             path: '/sign-up',

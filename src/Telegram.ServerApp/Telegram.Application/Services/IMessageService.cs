@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using Telegram.Application.Common.Models;
 using Telegram.Domain.Entities;
 
 namespace Telegram.Application.Services;
@@ -18,8 +19,11 @@ public interface IMessageService
         CancellationToken cancellationToken = default
         );
 
-    Task<IEnumerable<Message>> GetByChatRoomIdAsync(
+    Task<PaginationResult<Message>> GetByChatRoomIdAsync(
         long chatRoomId,
+        PaginationParameters pagination,
+        SortingParameters sorting,
+        string? search = null,
         string[]? includes = null,
         bool asNoTracking = true,
         CancellationToken cancellationToken = default

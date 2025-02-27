@@ -5,6 +5,7 @@ using Telegram.Application.Common.Extensions;
 using Telegram.Application.Common.Models;
 using Telegram.Application.Services;
 using Telegram.Domain.Entities;
+using Telegram.WebUI.Extensions;
 using Telegram.WebUI.Models.Messages;
 
 namespace Telegram.WebUI.Controllers;
@@ -20,7 +21,7 @@ public class MessageController(
     [HttpGet("{id:long}")]
     public async ValueTask<IActionResult> Get([FromRoute] long id)
     {
-        var exist = await messageService.GetByIdAsync(id, ["Sender", "Receiver"]);
+        var exist = await messageService.GetByIdAsync(id, ["Sender", "Receiver"], cancellationToken: HttpContext.RequestAborted);
 
         return Ok(mapper.Map<MessageViewModel>(exist));
     }
@@ -33,9 +34,16 @@ public class MessageController(
         [FromQuery] string? search = null
         )
     {
-        var exist = await messageService.GetByChatRoomIdAsync(id, ["Sender", "Receiver"]);
+        var exist = await messageService.GetByChatRoomIdAsync(id,
+            pagination,
+            sorting,
+            search,
+            includes: ["Sender", "Receiver"],
+            cancellationToken: HttpContext.RequestAborted);
 
-        return Ok(mapper.Map<IEnumerable<MessageViewModel>>(exist));
+        HttpContext.AddPaginationMetaData(exist.PaginationInfo);
+
+        return Ok(mapper.Map<IEnumerable<MessageViewModel>>(exist.Data));
     }
 
     [HttpPost]
@@ -60,7 +68,7 @@ public class MessageController(
     [HttpPut("mark-as-seen/{chatRoomId:long}/{userId:long}")]
     public async ValueTask<IActionResult> Put([FromRoute] long chatRoomId, [FromRoute] long userId)
     {
-        var result = await orchestrationService.MarkMessageAsSeenAsync(chatRoomId, userId);
+        var result = await orchestrationService.MarkMessageAsSeenAsync(chatRoomId, userId, HttpContext.RequestAborted);
 
         return Ok(result);
     }

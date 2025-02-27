@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using System.Linq.Expressions;
 using Telegram.Application.Common.Exceptions;
+using Telegram.Application.Common.Extensions;
+using Telegram.Application.Common.Models;
 using Telegram.Application.Services;
 using Telegram.Domain.Entities;
 using Telegram.Persistence.UnitOfWorks;
@@ -9,6 +11,26 @@ namespace Telegram.Infrastructure.Services;
 
 public class ChatRoomService(IUnitOfWork unitOfWork, IMapper mapper) : IChatRoomService
 {
+    public Task<PaginationResult<ChatRoom>> GetAllAsync(
+        PaginationParameters pagination,
+        SortingParameters sorting,
+        string? search = null,
+        string[]? includes = null,
+        bool asNoTracking = true,
+        CancellationToken cancellationToken = default
+        )
+    {
+        var exists = unitOfWork.ChatRooms.SelectAsQueryable(asNoTracking: asNoTracking, includes: includes);
+
+        if (search is not null)
+            exists = exists.Where(entity => entity.FirstUser.UserName.ToLower().Contains(search.ToLower())
+                || entity.SecondUser.UserName.ToLower().Contains(search.ToLower()));
+
+        exists = exists.Where(entity => !entity.IsDeleted).SortBy(sorting);
+
+        return Task.FromResult(exists.ToPaginate(pagination));
+    }
+
     public IQueryable<ChatRoom> Get(
         Expression<Func<ChatRoom, bool>>? expression = null,
         string[]? includes = null,
@@ -25,24 +47,33 @@ public class ChatRoomService(IUnitOfWork unitOfWork, IMapper mapper) : IChatRoom
         CancellationToken cancellationToken = default
         )
     {
-        var exists = await unitOfWork.ChatRooms.SelectAsync(entity => entity.Id == id, includes, asNoTracking, cancellationToken)
+        var exists = await unitOfWork.ChatRooms.SelectAsync(entity => entity.Id == id && !entity.IsDeleted, includes, asNoTracking, cancellationToken)
             ?? throw new NotFoundException(nameof(ChatRoom), id);
 
         return exists;
     }
 
-    public async Task<IEnumerable<ChatRoom>> GetByUserIdAsync(
+    public Task<PaginationResult<ChatRoom>> GetByUserIdAsync(
         long userId,
+        PaginationParameters pagination,
+        SortingParameters sorting,
+        string? search = null,
         string[]? includes = null,
         bool asNoTracking = true,
         CancellationToken cancellationToken = default
         )
     {
-        var exists = await unitOfWork.ChatRooms
-            .SelectAsEnumerableAsync(entity => (entity.FirstUserId == userId || entity.SecondUserId == userId) && !entity.IsDeleted,
-                includes, asNoTracking, cancellationToken);
+        var exists = unitOfWork.ChatRooms
+            .SelectAsQueryable(entity => (entity.FirstUserId == userId || entity.SecondUserId == userId) && !entity.IsDeleted,
+                includes, asNoTracking);
 
-        return exists;
+        if (search is not null)
+            exists = exists.Where(entity => entity.FirstUser.UserName.ToLower().Contains(search.ToLower())
+                || entity.SecondUser.UserName.ToLower().Contains(search.ToLower()));
+
+        exists = exists.SortBy(sorting);
+
+        return Task.FromResult(exists.ToPaginate(pagination));
     }
 
     public async Task<ChatRoom> GetByUsersIdAsync(
@@ -54,8 +85,8 @@ public class ChatRoomService(IUnitOfWork unitOfWork, IMapper mapper) : IChatRoom
         )
     {
         var exist = await unitOfWork.ChatRooms
-            .SelectAsync(entity => (entity.FirstUserId == firstUserId && entity.SecondUserId == secondUserId)
-                || (entity.FirstUserId == secondUserId && entity.SecondUserId == firstUserId),
+            .SelectAsync(entity => ((entity.FirstUserId == firstUserId && entity.SecondUserId == secondUserId)
+                || (entity.FirstUserId == secondUserId && entity.SecondUserId == firstUserId)) && !entity.IsDeleted,
                 includes, asNoTracking, cancellationToken)
             ?? throw new NotFoundException(nameof(ChatRoom), firstUserId);
 
@@ -63,20 +94,20 @@ public class ChatRoomService(IUnitOfWork unitOfWork, IMapper mapper) : IChatRoom
     }
 
     public async Task<ChatRoom> CreateAsync(ChatRoom chatRoom, CancellationToken cancellationToken = default)
-        {
+    {
 
         if (chatRoom.FirstUserId == chatRoom.SecondUserId)
             throw new ArgumentIsNotValidException("Chat room can not be with user id.");
 
         var exist = await unitOfWork.ChatRooms
-            .SelectAsync(entity => (entity.FirstUserId == chatRoom.FirstUserId && entity.SecondUserId == chatRoom.SecondUserId)
-                || (entity.FirstUserId == chatRoom.SecondUserId && entity.SecondUserId == chatRoom.FirstUserId),
+            .SelectAsync(entity => ((entity.FirstUserId == chatRoom.FirstUserId && entity.SecondUserId == chatRoom.SecondUserId)
+                || (entity.FirstUserId == chatRoom.SecondUserId && entity.SecondUserId == chatRoom.FirstUserId)) && !entity.IsDeleted,
                 cancellationToken: cancellationToken);
         if (exist is not null)
             throw new AlreadyExistException(nameof(chatRoom), chatRoom.FirstUserId);
 
         var created = await unitOfWork.ChatRooms.CreateAsync(chatRoom, cancellationToken);
-        
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return created;

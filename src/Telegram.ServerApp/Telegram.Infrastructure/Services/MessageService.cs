@@ -1,5 +1,7 @@
 ﻿using System.Linq.Expressions;
 using Telegram.Application.Common.Exceptions;
+using Telegram.Application.Common.Extensions;
+using Telegram.Application.Common.Models;
 using Telegram.Application.Services;
 using Telegram.Domain.Entities;
 using Telegram.Persistence.UnitOfWorks;
@@ -31,18 +33,25 @@ public class MessageService(IUnitOfWork unitOfWork, IChatRoomService chatRoomSer
         return exist;
     }
 
-    public async Task<IEnumerable<Message>> GetByChatRoomIdAsync(
+    public Task<PaginationResult<Message>> GetByChatRoomIdAsync(
         long chatRoomId,
+        PaginationParameters pagination,
+        SortingParameters sorting,
+        string? search = null,
         string[]? includes = null,
         bool asNoTracking = true,
         CancellationToken cancellationToken = default
         )
     {
-        var exists = await unitOfWork.Messages
-            .SelectAsEnumerableAsync(entity => entity.ChatRoomId == chatRoomId && !entity.IsDeleted,
-                includes, asNoTracking, cancellationToken);
+        var exists = unitOfWork.Messages
+            .SelectAsQueryable(entity => entity.ChatRoomId == chatRoomId, includes, asNoTracking);
 
-        return exists;
+        if (search is not null)
+            exists = exists.Where(entity => entity.Body.ToLower().Contains(search.ToLower()));
+
+        exists = exists.Where(entity => !entity.IsDeleted).SortBy(sorting);
+
+        return Task.FromResult(exists.ToPaginate(pagination));
     }
 
     public async Task<Message> CreateAsync(Message message, CancellationToken cancellationToken = default)

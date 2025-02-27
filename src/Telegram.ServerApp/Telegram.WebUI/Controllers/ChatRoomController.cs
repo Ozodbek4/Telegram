@@ -5,6 +5,7 @@ using Telegram.Application.Common.Extensions;
 using Telegram.Application.Common.Models;
 using Telegram.Application.Services;
 using Telegram.Domain.Entities;
+using Telegram.WebUI.Extensions;
 using Telegram.WebUI.Models.ChatRooms;
 
 namespace Telegram.WebUI.Controllers;
@@ -23,13 +24,19 @@ public class ChatRoomController(
         [FromQuery] string? search = null
         )
     {
-        return Ok();
+        var exists = await chatRoomService.GetAllAsync(pagination, sorting, search, includes: ["FirstUser", "SecondUser", "LastMessage"], cancellationToken: HttpContext.RequestAborted);
+
+        HttpContext.AddPaginationMetaData(exists.PaginationInfo);
+
+        return Ok(mapper.Map<IEnumerable<ChatRoomViewModel>>(exists.Data));
     }
 
     [HttpGet("{id:long}")]
     public async ValueTask<IActionResult> Get([FromRoute] long id)
     {
-        var exist = await chatRoomService.GetByIdAsync(id, ["FirstUser", "SecondUser", "LastMessage"], cancellationToken: HttpContext.RequestAborted);
+        var exist = await chatRoomService.GetByIdAsync(id,
+            includes: ["FirstUser", "SecondUser", "LastMessage"],
+            cancellationToken: HttpContext.RequestAborted);
 
         return Ok(mapper.Map<ChatRoomViewModel>(exist));
     }
@@ -42,15 +49,23 @@ public class ChatRoomController(
         [FromQuery] string? search = null
         )
     {
-        var entities = await chatRoomService.GetByUserIdAsync(userId, ["FirstUser", "SecondUser", "LastMessage"]);
+        var entities = await chatRoomService.GetByUserIdAsync(
+            userId,
+            pagination,
+            sorting,
+            search,
+            includes: ["FirstUser", "SecondUser", "LastMessage"],
+            cancellationToken: HttpContext.RequestAborted);
 
-        return Ok(mapper.Map<IEnumerable<ChatRoomViewModel>>(entities));
+        HttpContext.AddPaginationMetaData(entities.PaginationInfo);
+
+        return Ok(mapper.Map<IEnumerable<ChatRoomViewModel>>(entities.Data));
     }
 
     [HttpGet("{firstUserId:long}/{secondUserId:long}")]
     public async ValueTask<IActionResult> GetByUsersId([FromRoute] long firstUserId, [FromRoute] long secondUserId)
     {
-        var entities = await chatRoomService.GetByUsersIdAsync(firstUserId, secondUserId, ["FirstUser", "SecondUser", "LastMessage"]);
+        var entities = await chatRoomService.GetByUsersIdAsync(firstUserId, secondUserId, ["FirstUser", "SecondUser", "LastMessage"], cancellationToken: HttpContext.RequestAborted);
 
         return Ok(mapper.Map<ChatRoomViewModel>(entities));
     }
@@ -58,8 +73,8 @@ public class ChatRoomController(
     [HttpPost]
     public async ValueTask<IActionResult> Post([FromBody] CreateChatRoomModel model)
     {
-        await createValidator.EnsureValidationAsync(model);
-        var created = await chatRoomService.CreateAsync(mapper.Map<ChatRoom>(model));
+        await createValidator.EnsureValidationAsync(model, HttpContext.RequestAborted);
+        var created = await chatRoomService.CreateAsync(mapper.Map<ChatRoom>(model), HttpContext.RequestAborted);
 
         return Ok(mapper.Map<ChatRoomViewModel>(created));
     }
@@ -67,8 +82,8 @@ public class ChatRoomController(
     [HttpPut]
     public async ValueTask<IActionResult> Put([FromBody] UpdateChatRomModel model)
     {
-        await updateValidator.EnsureValidationAsync(model);
-        var created = await chatRoomService.UpdateAsync(mapper.Map<ChatRoom>(model));
+        await updateValidator.EnsureValidationAsync(model, HttpContext.RequestAborted);
+        var created = await chatRoomService.UpdateAsync(mapper.Map<ChatRoom>(model), HttpContext.RequestAborted);
 
         return Ok(mapper.Map<ChatRoomViewModel>(created));
     }
@@ -76,6 +91,6 @@ public class ChatRoomController(
     [HttpDelete("{id:long}")]
     public async ValueTask<IActionResult> Delete([FromRoute] long id)
     {
-        return Ok(await chatRoomService.DeleteAsync(id));
+        return Ok(await chatRoomService.DeleteAsync(id, HttpContext.RequestAborted));
     }
 }

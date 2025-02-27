@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -33,6 +34,7 @@ public static class WebApplicationBuilderExtensions
         services.AddMapper();
         services.AddSecurity(configuration);
         services.AddSignalR();
+        services.AddFluentValidation();
         services.AddCors(options =>
         {
             options.AddPolicy("AllowAllOrigins", builder =>
@@ -109,6 +111,12 @@ public static class WebApplicationBuilderExtensions
     private static IServiceCollection AddMapper(this IServiceCollection services)
     {
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
+        return services;
+    }
+
+    private static IServiceCollection AddFluentValidation(this IServiceCollection services)
+    {
+        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         return services;
     }
 

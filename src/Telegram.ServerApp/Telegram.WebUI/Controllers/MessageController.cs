@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Telegram.Application.Common.Extensions;
 using Telegram.Application.Common.Models;
 using Telegram.Application.Services;
 using Telegram.Domain.Entities;
@@ -7,7 +9,13 @@ using Telegram.WebUI.Models.Messages;
 
 namespace Telegram.WebUI.Controllers;
 
-public class MessageController(IMessageService messageService, IMapper mapper, IChatOrchestrationService orchestrationService) : BaseController
+public class MessageController(
+    IMessageService messageService,
+    IMapper mapper,
+    IChatOrchestrationService orchestrationService,
+    IValidator<CreateMessageModel> createValidator,
+    IValidator<UpdateMessageModel> updateValidator
+    ) : BaseController
 {
     [HttpGet("{id:long}")]
     public async ValueTask<IActionResult> Get([FromRoute] long id)
@@ -33,6 +41,7 @@ public class MessageController(IMessageService messageService, IMapper mapper, I
     [HttpPost]
     public async ValueTask<IActionResult> Post([FromBody] CreateMessageModel model)
     {
+        await createValidator.EnsureValidationAsync(model);
         var exist = await messageService.CreateAsync(mapper.Map<Message>(model), HttpContext.RequestAborted);
 
         return Ok(mapper.Map<MessageViewModel>(exist));
@@ -41,6 +50,7 @@ public class MessageController(IMessageService messageService, IMapper mapper, I
     [HttpPut("{id:long}")]
     public async ValueTask<IActionResult> Put([FromRoute] long id, UpdateMessageModel model)
     {
+        await updateValidator.EnsureValidationAsync(model);
         model.Id = id;
         var exist = await messageService.UpdateAsync(mapper.Map<Message>(model), HttpContext.RequestAborted);
 

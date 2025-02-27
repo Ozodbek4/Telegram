@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Telegram.Application.Common.Extensions;
 using Telegram.Application.Common.Models;
 using Telegram.Application.Services;
 using Telegram.Domain.Entities;
@@ -7,7 +9,12 @@ using Telegram.WebUI.Models.ChatRooms;
 
 namespace Telegram.WebUI.Controllers;
 
-public class ChatRoomController(IChatRoomService chatRoomService, IMapper mapper) : BaseController
+public class ChatRoomController(
+    IChatRoomService chatRoomService,
+    IMapper mapper,
+    IValidator<CreateChatRoomModel> createValidator,
+    IValidator<UpdateChatRomModel> updateValidator
+    ) : BaseController
 {
     [HttpGet]
     public async ValueTask<IActionResult> GetAll(
@@ -51,6 +58,7 @@ public class ChatRoomController(IChatRoomService chatRoomService, IMapper mapper
     [HttpPost]
     public async ValueTask<IActionResult> Post([FromBody] CreateChatRoomModel model)
     {
+        await createValidator.EnsureValidationAsync(model);
         var created = await chatRoomService.CreateAsync(mapper.Map<ChatRoom>(model));
 
         return Ok(mapper.Map<ChatRoomViewModel>(created));
@@ -59,6 +67,7 @@ public class ChatRoomController(IChatRoomService chatRoomService, IMapper mapper
     [HttpPut]
     public async ValueTask<IActionResult> Put([FromBody] UpdateChatRomModel model)
     {
+        await updateValidator.EnsureValidationAsync(model);
         var created = await chatRoomService.UpdateAsync(mapper.Map<ChatRoom>(model));
 
         return Ok(mapper.Map<ChatRoomViewModel>(created));

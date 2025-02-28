@@ -1,4 +1,5 @@
 import type { CreateMessageModel } from "../models/CreateMessageModel";
+import { PaginationParameters } from "../models/PaginationPrameters";
 import type { UpdateMessageModel } from "../models/UpdateMessageModel";
 import axiosInstance from "./AxiosInstance";
 
@@ -8,14 +9,10 @@ class MessageApiClient {
     }
 
     async getByChatRoomId(chatRoomId: number) {
+        const params = new PaginationParameters({ SortBy: "id", SortType: "desc" });
+
         return axiosInstance.get(`api/message/chat-room/${chatRoomId}`, {
-            params: {
-                PageNumber: 1,
-                PageSize: 200,
-                SortBy: `id`,
-                SortType: `desc`,
-                search: null,
-            }
+            params
         });
     }
 

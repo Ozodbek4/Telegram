@@ -1,9 +1,9 @@
 import type { Message } from "./Message";
 import type { User } from "./User";
 
-export interface ChatRoom{
+export interface ChatRoom {
     id: number;
-    
+
     firstUserId: number;
     firstUser: User;
 
@@ -11,7 +11,7 @@ export interface ChatRoom{
     secondUser: User;
 
     lastMessageId: number;
-    lastMessage: Message;
+    lastMessage: Message | null;
 
     firstUserUnreadMessageCount: number;
     secondUserUnreadMessageCount: number;

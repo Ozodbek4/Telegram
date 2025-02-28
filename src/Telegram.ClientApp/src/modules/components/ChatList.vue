@@ -1,11 +1,21 @@
 <template>
     <div class="flex flex-col h-screen bg-white border-r flex-shrink-0 lg: flex flex-row h-screen">
-        <div class="p-4 border-b flex items-center justify-between">
+        <!-- chats -->
+        <div class="p-4 border-b flex center justify-center">
             <h2 class="text-lg font-semibold">Chats</h2>
         </div>
 
-        <SearchButton/>
+        <!-- search -->
 
+        <div class="p-4">
+            <input type="text"
+                v-model="searchQuery"
+                placeholder="Search"
+                class="w-full p-2 border rounded-lg focus:outline-none focus:bg-gray-100 focus:ring-2 focus:ring-gray-400"
+                @input="chatRoomsFunc(searchQuery)">
+        </div>
+
+        <!-- chat rooms -->
         <div class="scrollbar-hidden overflow-y-auto">
             <ChatItem
                 v-for="chatRoom in chatRooms"
@@ -17,22 +27,22 @@
 </template>
 
 <script lang="ts" setup>
-import ChatRoomApiClient from '@/infrastructure/http/ChatRoomApiClient';
 import ChatItem from '../components/ChatItem.vue';
 import LocalStorageService from '@/infrastructure/services/LocalStorageService';
 import type { User } from '../models/User';
 import type { ChatRoom } from '../models/ChatRoom';
 import { onMounted, ref } from 'vue';
-import SearchButton from './SearchButton.vue';
+import ChatRoomService from '@/infrastructure/services/ChatRoomService';
 
 const me = LocalStorageService.get<User>('me');
 const chatRooms = ref<ChatRoom[]>([]);
 const emit = defineEmits(['select-chat']);
 const selectChat = (chat: ChatRoom) => emit('select-chat', chat);
+const searchQuery = ref<string>('');
 
-const chatRoomsFunc = async () => {
-    var res = await ChatRoomApiClient.getUserChatRooms(me!.id);
-    chatRooms.value = res.data;
+const chatRoomsFunc = async (search = '') => {
+    var res = await ChatRoomService.getUserChatRooms(me!.id, search);
+    chatRooms.value = res;
 }
 
 onMounted(chatRoomsFunc);

@@ -7,7 +7,7 @@ import type { User } from "@/modules/models/User";
 
 class ChatRoomService {
     async getUserChatRooms(userId: number, search = ''): Promise<ChatRoom[]> {
-        var params = new PaginationParameters({ search: search });
+        var params = new PaginationParameters({ SortBy: 'lastMessage', SortType: 'desc' });
 
         if (search == null || search === '') {
             return (await ChatRoomApiClient.getUserChatRooms(userId, params)).data;
@@ -18,7 +18,7 @@ class ChatRoomService {
     }
 
     private async getSearched(query: string): Promise<ChatRoom[]> {
-        const params = new PaginationParameters({ search: query, PageSize: 10 });
+        const params = new PaginationParameters({ PageSize: 10, search: query });
         let users = (await UserApiClient.get(params)).data as User[];
         const me = LocalStorageService.get<User>('me');
         users = users.filter(user => user.id !== me?.id);

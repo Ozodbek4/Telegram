@@ -8,8 +8,8 @@
             <h3 class="text-lg font-medium">{{ secondUser.firstName + ' ' + secondUser.lastName}}</h3>
             <p class="text-sm text-gray-500">{{ chat.lastMessage?.body || 'No message yet' }}</p>
         </div>
-        <div v-if="chat.firstUserUnreadMessageCount" class="ml-auto min-w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
-            <span class="text-white text-base p-1">{{ chat.firstUserUnreadMessageCount }}</span>
+        <div v-if="(isMe && isMe ? chat.firstUserUnreadMessageCount : chat.secondUserUnreadMessageCount)" class="ml-auto min-w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
+            <span class="text-white text-base p-1">{{ isMe ? chat.firstUserUnreadMessageCount : chat.secondUserUnreadMessageCount }}</span>
         </div>
     </div>
 </template>

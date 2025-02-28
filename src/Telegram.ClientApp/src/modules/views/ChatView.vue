@@ -4,12 +4,11 @@
             v-if="!activeChat || isLargeScreen"
             @select-chat="selectChat"
             class="w-full lg:w-1/3"/>
-        <div class="flex flex-col w-full bg-white">
-            <ChatWindow
+        <ChatWindow
             v-model:activeChat="activeChat"
             v-if="activeChat"
-            @update:activechat="activeChat = $event"/>
-        </div>
+            @update:activechat="activeChat = $event"
+            class="w-full lg:w-2/3"/>
     </div>
 </template>
 

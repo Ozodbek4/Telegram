@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col h-screen bg-white border-r flex-shrink-0 lg:flex-row">
+    <div class="flex flex-col h-screen bg-white border-r flex-shrink-0 lg: flex flex-row h-screen">
         <div class="p-4 border-b flex items-center justify-between">
             <h2 class="text-lg font-semibold">Chats</h2>
         </div>

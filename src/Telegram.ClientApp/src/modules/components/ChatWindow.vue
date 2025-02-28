@@ -1,6 +1,6 @@
 <template>
     <!-- Head -->
-    <div v-if="activeChat" class="flex flex-col w-full bg-white lg:flex-row h-screen">
+    <div v-if="activeChat" class="flex flex-col w-full bg-white lg:flex flex-row h-screen">
         <div class="flex items-center gap-4 p-4 border-b">
             <button @click="handleKeyBack" class="w-10 h-10 bg-white/70 hover:bg-white/90 backdrop-blur-md border border-gray-300 shadow-lg flex items-center justify-center rounded-full transition-all duration-300 ease-in-out hover:scale-105">
                 <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

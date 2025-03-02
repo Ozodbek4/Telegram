@@ -13,8 +13,7 @@ class ChatRoomService {
             return (await ChatRoomApiClient.getUserChatRooms(userId, params)).data;
         }
 
-        const res = await this.getSearched(search);
-        return res;
+        return await this.getSearched(search);
     }
 
     private async getSearched(query: string): Promise<ChatRoom[]> {

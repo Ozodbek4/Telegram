@@ -11,7 +11,7 @@ import router from '@/infrastructure/router';
 import AuthService from '@/infrastructure/services/AuthService';
 
 async function signIn(params: SignInModel) {
-    AuthService.signIn(params);
+    await AuthService.signIn(params);
 }
 
 async function signUp() {

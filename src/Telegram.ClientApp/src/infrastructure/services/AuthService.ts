@@ -1,3 +1,4 @@
+import type { User } from "@/modules/models/User";
 import AuthApiClient from "../http/AuthApiClient";
 import type { SignInModel } from "../models/SignInModel";
 import router from "../router";
@@ -8,8 +9,9 @@ class AuthService {
         try {
             const response = await AuthApiClient.singIn(params);
 
-            LocalStorageService.set('accessToken', response.data.token);
-            LocalStorageService.set('me', response.data.user);
+            console.log(response);
+            LocalStorageService.set<string>('accessToken', response.data.token);
+            LocalStorageService.set<User>('me', response.data.user);
 
             router.push({ name: 'Home' });
         }

@@ -11,19 +11,19 @@ public static class WebApplicationExtensions
         app.UseHttpsRedirection();
         app.UseRouting();
 
+        app.UseCors("AllowAllOrigins");
         app.UseAuthentication();
         app.UseAuthorization();
 
-        app.MapHub<ChatHub>("chat-hub");
 
         app.UseSwagger();
         app.UseSwaggerUI();
 
-        app.UseCors("AllowAllOrigins");
 
         app.UseWebSockets();
 
         app.MapControllers();
+        app.MapHub<ChatHub>("/chat-hub");
 
         return app;
     }

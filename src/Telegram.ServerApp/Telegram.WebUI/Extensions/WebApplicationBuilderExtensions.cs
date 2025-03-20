@@ -39,9 +39,10 @@ public static class WebApplicationBuilderExtensions
         {
             options.AddPolicy("AllowAllOrigins", builder =>
             {
-                builder.AllowAnyOrigin()
-                       .AllowAnyHeader()
-                       .AllowAnyMethod();
+                builder.WithOrigins("http://localhost:5173") // ✅ Specify your Vue.js frontend origin
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
             });
         });
 
@@ -149,7 +150,7 @@ public static class WebApplicationBuilderExtensions
                     var accessToken = context.Request.Query["access_token"];
 
                     var path = context.HttpContext.Request.Path;
-                    if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/chatHub"))
+                    if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/chat-hub"))
                     {
                         context.Token = accessToken;
                     }

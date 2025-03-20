@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Telegram.Application.Common.Extensions;
 using Telegram.Application.Common.Models;
@@ -10,6 +11,7 @@ using Telegram.WebUI.Models.ChatRooms;
 
 namespace Telegram.WebUI.Controllers;
 
+[Authorize]
 public class ChatRoomController(
     IChatRoomService chatRoomService,
     IMapper mapper,

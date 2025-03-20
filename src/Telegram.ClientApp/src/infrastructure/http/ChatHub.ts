@@ -1,21 +1,19 @@
 import * as signalR from "@microsoft/signalr";
 import LocalStorageService from "../services/LocalStorageService";
+import { ref } from "vue";
+import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
 
-const token = localStorage.getItem("accessToken");
+const connection = ref<HubConnection | null>(null);
 
-const connection = new signalR.HubConnectionBuilder()
-    .withUrl("https://localhost:7165/chat-hub", {
-        accessTokenFactory: () => `Bearer ${token}`,
-        headers: {
-            "Content-Type": "application/json",
-        },
-    })
-    .withAutomaticReconnect()
-    .build();;
+const token = LocalStorageService.get<string>('accessToken');
+
+connection.value = new HubConnectionBuilder()
+    .withUrl(`https://localhost:7165/chat-hub?access_token=${token}`)
+    .build();
 
 export async function startConnection() {
     try {
-        await connection.start();
+        await connection.value?.start();
         console.log("Connected to singnalR");
     }
     catch (error) {
@@ -26,7 +24,7 @@ export async function startConnection() {
 
 export async function sendMessage(userId: string, body: string) {
     try {
-        await connection.invoke("SendMessage", userId, body);
+        await connection.value?.invoke("SendMessage", userId, body);
     }
     catch (error) {
         console.error("Error with sending message:", error);
@@ -34,7 +32,7 @@ export async function sendMessage(userId: string, body: string) {
 }
 
 export async function onReceiveMessage(callback: (message: any) => void) {
-    connection.on("ReceiveMessage", callback);
+    connection.value?.on("ReceiveMessage", callback);
 }
 
 export default connection;

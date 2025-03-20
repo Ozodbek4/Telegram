@@ -56,9 +56,20 @@ public class MessageService(IUnitOfWork unitOfWork, IChatRoomService chatRoomSer
 
     public async Task<Message> CreateAsync(Message message, CancellationToken cancellationToken = default)
     {
-        var chatRoom = await chatRoomService.GetByUsersIdAsync(message.SenderId, message.ReceiverId, asNoTracking: false);
+        var chatRoom = await unitOfWork.ChatRooms
+            .SelectAsync(entity => ((entity.FirstUserId == message.SenderId && entity.SecondUserId == message.ReceiverId)
+                || (entity.FirstUserId == message.ReceiverId && entity.SecondUserId == message.SenderId)) && !entity.IsDeleted,
+                asNoTracking: false,
+                cancellationToken: cancellationToken);
 
-        if (chatRoom.FirstUserId == message.ReceiverId)
+        if (chatRoom is null)
+        {
+            chatRoom = new ChatRoom { FirstUserId = message.SenderId, SecondUserId = message.ReceiverId };
+            await unitOfWork.ChatRooms.CreateAsync(chatRoom, cancellationToken);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
+        }
+
+        if (chatRoom!.FirstUserId == message.ReceiverId)
             chatRoom.FirstUserUnreadMessageCount++;
         else if (chatRoom.SecondUserId == message.ReceiverId)
             chatRoom.SecondUserUnreadMessageCount++;

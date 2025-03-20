@@ -10,18 +10,25 @@ namespace Telegram.WebUI.Hubs;
 [Authorize]
 public class ChatHub(IUserService userService, IMessageService messageService, IChatRoomService chatRoomService, IMapper mapper) : Hub
 {
-    public async Task SendMessage(string user, CreateMessageModel model)
+    public async Task SendMessage(string user, string body)
     {
         var senderId = GetRequiredUserId();
         var receiverId = Convert.ToInt64(user);
 
         var receiver = await userService.GetByIdAsync(receiverId);
         var chatRoom = await chatRoomService.GetByUsersIdAsync(senderId, receiverId);
+        var created = new Message { SenderId = senderId, ReceiverId = receiver.Id, ChatRoomId = chatRoom.Id, Body = body };
 
-        var message = await messageService.CreateAsync(mapper.Map<Message>(model));
+        var message = await messageService.CreateAsync(created);
         var messageViewModel = mapper.Map<MessageViewModel>(message);
-
-        await Clients.All.SendAsync("ReceiveMessage", message);
+        try
+        {
+            await Clients.User(receiver.Id.ToString()).SendAsync("ReceiveMessage", messageViewModel);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+        }
     }
 
     #region

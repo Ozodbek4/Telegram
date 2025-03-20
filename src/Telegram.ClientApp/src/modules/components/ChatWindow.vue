@@ -62,15 +62,18 @@ const sendMessage = async (newMessage: string, activeChat: ChatRoom) => {
     mes.value.senderId = me!.id;
     mes.value.receiverId = secondUser.value.id;
 
-    const reponse = await MessageApiClient.post(mes.value);
+    const reponse = (await MessageApiClient.post(mes.value)).data as Message;
+    messages.value.unshift(reponse);
+    activeChat.lastMessageId = reponse.id;
+    activeChat.lastMessage = reponse;
     newMessageBase.value = "";
 }
 
 // handle enter key pass
 const handleKeyPress = (event: KeyboardEvent, newMessage: string, activeChat: ChatRoom) => {
-  if (event.key === "Enter") {
-    sendMessage(newMessage, activeChat);
-  }
+    if (event.key === "Enter") {
+        sendMessage(newMessage, activeChat);
+    }
 };
 
 // handle back button click

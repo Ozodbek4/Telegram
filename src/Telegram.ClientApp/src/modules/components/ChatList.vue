@@ -33,6 +33,8 @@ import type { User } from '../models/User';
 import type { ChatRoom } from '../models/ChatRoom';
 import { onMounted, ref } from 'vue';
 import ChatRoomService from '@/infrastructure/services/ChatRoomService';
+import { onReceiveMessage, onUserConnected, onUserDisconnected, startConnection } from '@/infrastructure/http/ChatHub';
+import type { Message } from 'postcss';
 
 const me = LocalStorageService.get<User>('me');
 const chatRooms = ref<ChatRoom[]>([]);
@@ -41,11 +43,48 @@ const selectChat = (chat: ChatRoom) => emit('select-chat', chat);
 const searchQuery = ref<string>('');
 
 const chatRoomsFunc = async (search = '') => {
-    var res = await ChatRoomService.getUserChatRooms(me!.id, search);
-    chatRooms.value = res;
-}
+    try {
+        const res = await ChatRoomService.getUserChatRooms(me!.id, search);
+        chatRooms.value = [...res]; // Force Vue to recognize the update
+    } catch (error) {
+        // console.error('Error fetching chat rooms:', error);
+    }
+};
 
-onMounted(chatRoomsFunc);
+onReceiveMessage(async (message: Message) => {
+    const chatRoomIndex = chatRooms.value.findIndex(c => c.id === message.chatRoomId);
+
+    if (chatRoomIndex !== -1) {
+        // Move chat to top
+        const chatRoom = chatRooms.value.splice(chatRoomIndex, 1)[0];
+        chatRooms.value.unshift(chatRoom);
+    }
+
+    // Fetch updated chat rooms (includes unread message counts)
+    await chatRoomsFunc();
+});
+
+
+// Handle real-time user connection status
+onUserConnected((userId: string) => {
+    const chatRoom = chatRooms.value.find(c => c.secondUser.id.toString() === userId);
+    if (chatRoom) {
+        chatRoom.secondUser.isOnline = true;
+    }
+});
+
+onUserDisconnected((userId: string) => {
+    const chatRoom = chatRooms.value.find(c => c.secondUser.id.toString() === userId);
+    if (chatRoom) {
+        chatRoom.secondUser.isOnline = false;
+    }
+});
+
+// Initialize WebSocket connection
+onMounted(async () => {
+    await chatRoomsFunc();
+    await startConnection();
+});
 </script>
 
 <style scoped>

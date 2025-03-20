@@ -2,7 +2,7 @@ import axios, { AxiosError, type InternalAxiosRequestConfig, type AxiosResponse 
 import LocalStorageService from "../services/LocalStorageService";
 
 const axiosInstance = axios.create({
-    baseURL: "https://localhost:7165",
+    baseURL: "https://chat.ozodbek4.uz",
     headers: {
         "Content-Type": "application/json",
     },
@@ -19,7 +19,7 @@ axiosInstance.interceptors.request.use(
         return config;
     },
     (error: AxiosError) => {
-        console.error("Request Error:", error);
+        // console.error("Request Error:", error);
         return Promise.reject(error);
     }
 );
@@ -36,7 +36,7 @@ axiosInstance.interceptors.response.use(
             alert("You do not have permission to perform this action.");
         }
 
-        console.error("Response Error:", error);
+        // console.error("Response Error:", error);
         return Promise.reject(error);
     }
 );

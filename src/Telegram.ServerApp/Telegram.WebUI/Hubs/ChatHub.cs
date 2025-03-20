@@ -14,9 +14,16 @@ public class ChatHub(IUserService userService, IMessageService messageService, I
     {
         var senderId = GetRequiredUserId();
         var receiverId = Convert.ToInt64(user);
-
         var receiver = await userService.GetByIdAsync(receiverId);
-        var chatRoom = await chatRoomService.GetByUsersIdAsync(senderId, receiverId);
+        ChatRoom chatRoom;
+        try
+        {
+            chatRoom = await chatRoomService.GetByUsersIdAsync(senderId, receiverId);
+        }
+        catch
+        {
+            chatRoom = await chatRoomService.CreateAsync(new ChatRoom { FirstUserId = senderId, SecondUserId = receiverId });
+        }
         var created = new Message { SenderId = senderId, ReceiverId = receiver.Id, ChatRoomId = chatRoom.Id, Body = body };
 
         var message = await messageService.CreateAsync(created);

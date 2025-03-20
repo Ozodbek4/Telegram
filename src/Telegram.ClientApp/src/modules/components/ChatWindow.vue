@@ -16,7 +16,8 @@
 
         <!-- Messages -->
         <div class="scrollbar-hidden flex flex-col-reverse overflow-y-auto p-6 bg-green-50 h-full gap-3">
-        <MessageItem v-for="message in messages" :key="message.id" :message="message"/>
+            <MessageItem v-for="message in messages" :key="message.id" :message="message"/>
+            <p v-if="loadingMessages" class="text-center text-gray-500">Loading messages...</p>
         </div>
 
         <!-- Input -->
@@ -31,42 +32,76 @@
 import LocalStorageService from '@/infrastructure/services/LocalStorageService';
 import type { ChatRoom } from '../models/ChatRoom';
 import type { User } from '../models/User';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import MessageItem from './MessageItem.vue';
 import MessageApiClient from '@/infrastructure/http/MessageApiClient';
 import type { Message } from '../models/Message';
 import type { CreateMessageModel } from '@/infrastructure/models/CreateMessageModel';
+import { onReceiveMessage, onSendMessage, startConnection } from '@/infrastructure/http/ChatHub';
 
 // define props and emits
-const proms = defineProps<{ activeChat: ChatRoom | null }>();
+const props = defineProps<{ activeChat: ChatRoom | null }>();
 const emit = defineEmits(['update:activechat']);
 
 // reactive data
-const newMessageBase = ref("");
+const newMessageBase = ref('');
 const me = LocalStorageService.get<User>('me');
-const isMe = computed(() => proms.activeChat!.firstUserId == me?.id);
-const secondUser = computed(() => isMe.value ? proms.activeChat!.secondUser : proms.activeChat!.firstUser);
+const isMe = computed(() => props.activeChat!.firstUserId == me?.id);
+const secondUser = computed(() => isMe.value ? props.activeChat!.secondUser : props.activeChat!.firstUser);
 const messages = ref<Message[]>([]);
+const loadingMessages = ref(false);
 
-// fetch message
-const messagesFunc = async () => {
-    messages.value = (await MessageApiClient.getByChatRoomId(proms.activeChat!.id)).data;
-}
+//
+const loadMessageHistory = async () => {
+    if (!props.activeChat) return;
+        loadingMessages.value = true;
+    try {
+        const response = await MessageApiClient.getByChatRoomId(props.activeChat.id);
+        messages.value = response.data;
+        await nextTick();
+    }
+    catch (error) {
+        // console.error('Failed to load messages:', error);
+    }
+    finally {
+        loadingMessages.value = false;
+    }
+};
+
+
+// watch
+watch(() => props.activeChat, async (newChat) => {
+    if (newChat) {
+        messages.value = [];
+        await loadMessageHistory();
+
+        if (isMe.value) {
+            newChat.firstUserUnreadMessageCount = 0;
+        } else {
+            newChat.secondUserUnreadMessageCount = 0;
+        }
+    }
+}, { immediate: true, deep: true });
+
+onReceiveMessage((message: Message) => {
+    if (message.chatRoomId === props.activeChat?.id) {
+        messages.value.unshift(message);
+    };
+});
 
 // send message
 const sendMessage = async (newMessage: string, activeChat: ChatRoom) => {
-    if (proms.activeChat === null || newMessage.trim() == '')
+    if (props.activeChat === null || newMessage.trim() == '')
         return;
-    const mes = ref({} as CreateMessageModel);
+    const mes = ref({} as Message);
     mes.value.body = newMessage;
     mes.value.senderId = me!.id;
     mes.value.receiverId = secondUser.value.id;
+    mes.value.createdAt = new Date().toString();
 
-    const reponse = (await MessageApiClient.post(mes.value)).data as Message;
-    messages.value.unshift(reponse);
-    activeChat.lastMessageId = reponse.id;
-    activeChat.lastMessage = reponse;
-    newMessageBase.value = "";
+    messages.value.unshift(mes.value);
+    await onSendMessage(mes.value.receiverId.toString(), newMessage)
+    newMessageBase.value = '';
 }
 
 // handle enter key pass
@@ -79,7 +114,6 @@ const handleKeyPress = (event: KeyboardEvent, newMessage: string, activeChat: Ch
 // handle back button click
 const handleKeyBack = () => {
     emit('update:activechat', null);
-    console.log('done')
 }
 
 const handleEscKey = (event: KeyboardEvent) => {
@@ -88,14 +122,9 @@ const handleEscKey = (event: KeyboardEvent) => {
     }
 }
 
-// watch active chat changes
-watch(() => proms.activeChat, async () => {
-    await messagesFunc();
-}, { deep: true });
-
 // fetch meesagesFunc
 onMounted(() => {
-    messagesFunc();
+    startConnection();
     window.addEventListener("keydown", handleEscKey)
 });
 </script>

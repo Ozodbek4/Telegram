@@ -39,7 +39,7 @@ public static class WebApplicationBuilderExtensions
         {
             options.AddPolicy("AllowAllOrigins", builder =>
             {
-                builder.WithOrigins("http://localhost:5173") // ✅ Specify your Vue.js frontend origin
+                builder.WithOrigins("http://localhost:5173", "https://chat-app-jade-five.vercel.app") // ✅ Specify your Vue.js frontend origin
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();

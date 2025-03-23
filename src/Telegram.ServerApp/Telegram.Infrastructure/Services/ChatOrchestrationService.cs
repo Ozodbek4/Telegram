@@ -23,9 +23,10 @@ public class ChatOrchestrationService(IUnitOfWork unitOfWork) : IChatOrchestrati
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         var messages = unitOfWork.Messages.SelectAsQueryable(entity => entity.ChatRoomId == chatRoomId
-            && !entity.IsSeen && !entity.IsSeen,
-            asNoTracking: false)
-            .ExecuteUpdateAsync(setters => setters.SetProperty(m => m.IsSeen, true), cancellationToken);
+            && entity.SenderId != userId && !entity.IsSeen,
+            asNoTracking: false);
+
+        await messages.ExecuteUpdateAsync(setters => setters.SetProperty(m => m.IsSeen, true), cancellationToken);
 
         return true;
     }

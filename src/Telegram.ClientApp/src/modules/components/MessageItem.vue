@@ -2,7 +2,7 @@
     <div class="max-w-xs p-3 rounded-lg shadow-xl" :class="isMe ? 'justify-end bg-sky-200 ml-auto' : 'justify-start bg-white mr-auto'">
         <p class="text-sm">{{ message.body }}</p>
         
-        <div v-if="isMe" class="flex justify-end text-gray-500 text-xs">
+        <div class="flex justify-end text-gray-500 text-xs">
             <span class="ml-1">{{ formattedDate }}</span>
         </div>
         <div v-if="isMe" class="flex justify-end text-gray-500 text-xs">

@@ -44,7 +44,9 @@ const updateWindowWidth = () => {
 const selectChat = (chat: ChatRoom) => {
     activeChat.value = chat;
     const me = LocalStorageService.get<User>('me');
-    MessageApiClient.putAsSeen(chat.id, me!.id)
+    (async () => {
+        await MessageApiClient.putAsSeen(chat.id, me!.id);
+    })();
 };
 
 // Event listeners for window resize
